@@ -1,0 +1,11 @@
+/.idea/
+/*.iml
+/.gradle/
+/build/
+/out/
+/.project
+/runtime/
+*.bak
+*.log
+*~
+hs_err_pid*

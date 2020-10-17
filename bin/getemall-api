@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+export GETEMALL_API_HOME
+export GETEMALL_API_CURR
+export GETEMALL_API_CONF
+
+GETEMALL_API_HOME=$(readlink -e $0)
+GETEMALL_API_HOME=$(dirname ${GETEMALL_API_HOME})
+GETEMALL_API_HOME=$(cd "${GETEMALL_API_HOME}/.."; pwd)
+
+GETEMALL_API_CURR=$(pwd)
+
+GETEMALL_API_CONF=${GETEMALL_API_HOME}/conf
+source ${GETEMALL_API_CONF}/getemall-api-env.sh
+
+${GETEMALL_API_HOME}/bin/run-getemall-api "$@"
