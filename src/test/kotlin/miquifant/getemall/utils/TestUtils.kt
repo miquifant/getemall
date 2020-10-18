@@ -29,4 +29,29 @@ class TestUtils {
     assertEquals("user",                metadata.user)
     assertEquals("test-version",        metadata.version)
   }
+
+  @Test
+  fun testSimpleSplit() {
+    val emptyString          = ""
+    val singleTokenString    = "aa"
+    val twoTokensString      = "aa bb"
+    val leadingSpacesString  = "  aa bb"
+    val trailingSpacesString = "aa bb  "
+    val nullTokensString     = "aa bb  cc dd"
+    val spacesOrgy           = "  a   bb     ccc      dddd      "
+
+    assertEquals(0, emptyString.simpleSplit().size)
+    assertEquals(1, singleTokenString.simpleSplit().size)
+    assertEquals(2, twoTokensString.simpleSplit().size)
+    assertEquals(2, leadingSpacesString.simpleSplit().size)
+    assertEquals(2, trailingSpacesString.simpleSplit().size)
+    assertEquals(4, nullTokensString.simpleSplit().size)
+
+    val spacesOrgyArray = spacesOrgy.simpleSplit()
+    assertEquals(4,      spacesOrgyArray.size)
+    assertEquals("a",    spacesOrgyArray[0])
+    assertEquals("bb",   spacesOrgyArray[1])
+    assertEquals("ccc",  spacesOrgyArray[2])
+    assertEquals("dddd", spacesOrgyArray[3])
+  }
 }
