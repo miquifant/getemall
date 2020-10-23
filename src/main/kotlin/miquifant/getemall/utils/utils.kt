@@ -33,3 +33,12 @@ fun retrieveAppMetadata(): AppMetadata {
   val machine = data[3]
   return AppMetadata(AppMetadataObject.version, date, user, machine)
 }
+
+/**
+ * Splits a String yielding a String Array with no empty elements
+ * Example:    >····'····'····'····'····'····'····'·<
+ * The String: " app  command  --option1   --option2 "
+ * will return ["app", "command", "--option1", "--option2"]
+ */
+fun String.simpleSplit(): Array<String> =
+    this.split(Regex(" ")).toList().mapNotNull { e -> if (e.isBlank()) null else e }.toTypedArray()

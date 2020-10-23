@@ -40,4 +40,10 @@ dependencies {
 
   // Use the Kotlin JUnit integration.
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+
+  // App dependencies
+  compile("com.offbytwo", "docopt", "0.6.0.20150202")
+
+  // App test dependencies
+  testCompile("com.github.stefanbirkner", "system-rules", "1.17.0")
 }
