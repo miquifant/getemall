@@ -43,6 +43,7 @@ dependencies {
 
   // App dependencies
   compile("com.offbytwo", "docopt", "0.6.0.20150202")
+  compile("com.typesafe", "config", "1.3.4")
 
   // App test dependencies
   testCompile("com.github.stefanbirkner", "system-rules", "1.17.0")
