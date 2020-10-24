@@ -5,12 +5,27 @@
  */
 package miquifant.getemall.command
 
+import java.io.File
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 
 class TestCommands {
+
+  @Test
+  fun testLoadFullConfig() {
+    val testConfFile = "getemall/command/test-load-custom-config.conf"
+
+    val config = loadFullConfig(File(this.javaClass.classLoader.getResource(testConfFile).file).canonicalFile.path)
+
+    val existingVarName = "some-attribute"
+    val existingVarValue = "some-value"
+    assertTrue(config.hasPath(existingVarName), "config should have a '$existingVarName' attribute")
+    assertEquals(existingVarValue, config.getString(existingVarName))
+  }
 
   @Test
   fun testNotYetImplementedCommand() {
