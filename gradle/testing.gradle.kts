@@ -17,7 +17,7 @@ tasks.named<Test>("test") {
   // Configure environment variables for testing (as if they were initialized by start script)
   environment.putAll(mapOf(
       "GETEMALL_API_HOME" to "$projectDir",
-      "GETEMALL_API_CONF" to "$projectDir/conf"
+      "GETEMALL_API_CONF" to "$projectDir/src/test/resources/conf"
   ))
   // Configure system properties (not used, but just in case we need some special local library)
   systemProperties.putAll(mapOf(
