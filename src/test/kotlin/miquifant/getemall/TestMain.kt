@@ -109,28 +109,4 @@ class TestMain {
     exit.expectSystemExitWithStatus(0)
     main(args.simpleSplit())
   }
-
-  @Test
-  fun testMainServe() {
-    val args = "serve"
-    try {
-      main(args.simpleSplit())
-      fail("serve command is not implemented and should throw an exception")
-    } catch (e: NotImplementedError) {
-
-      assertNotNull("Not Implemented Error message should not be null", e.message)
-
-      val beginOdMessage = "An operation is not implemented: "
-      assertTrue (e.message!!.startsWith(beginOdMessage),
-          "Not Implemented Error message should start with '$beginOdMessage'")
-
-      val messageContent = " serve=true"
-      assertTrue (
-          e.message!!.contains(messageContent),
-          "Not Implemented Error message should contain '$messageContent'"
-      )
-    } catch (e: Exception) {
-      fail("serve command is not implemented and should throw NotImplementedError")
-    }
-  }
 }
