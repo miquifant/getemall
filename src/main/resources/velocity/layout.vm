@@ -1,0 +1,51 @@
+#macro(mainLayout)
+<html>
+  <head>
+    <title>$msg.get("COMMON_TITLE")</title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="icon" href="/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="iso-8859-1">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/index"><img id="logo" src="/images/logo.png" alt="$msg.get("COMMON_HOME")"></a>
+        <ul id="chooseLanguage">
+          <form>
+            <li><button name="locale" value="de" style="background-image: url(/images/lang/de.png);"></button></li>
+            <li><button name="locale" value="en" style="background-image: url(/images/lang/en.png);"></button></li>
+            <li><button name="locale" value="es" style="background-image: url(/images/lang/es.png);"></button></li>
+          </form>
+        </ul>
+        <ul id="menu">
+          <li><a href="/v1">$msg.get("COMMON_NAV_PAGE_1")</a></li>
+          <li><a href="/v2">$msg.get("COMMON_NAV_PAGE_2")</a></li>
+#if($currentUser)
+          <li>
+            <form method="post" action="/logout">
+              <button id="logout">$msg.get("COMMON_NAV_LOGOUT")</button>
+            </form>
+          </li>
+#else
+          <li><a href="/login">$msg.get("COMMON_NAV_LOGIN")</a></li>
+#end
+        </ul>
+      </nav>
+    </header>
+    <main>
+#if($currentUser)
+      <div>$currentUser ($currentRole)</div>
+#else
+      <div>anonymous</div>
+#end
+      <div id="content">
+        $bodyContent
+      </div>
+    </main>
+    <footer>
+      $msg.get("COMMON_FOOTER_TEXT")
+    </footer>
+  </body>
+</html>
+#end

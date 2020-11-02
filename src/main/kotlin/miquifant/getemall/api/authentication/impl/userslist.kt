@@ -40,4 +40,15 @@ class UserListDao: UserDao {
       }
     }
   }
+
+  // TODO Delete dead code. This method doesn't do anything, it's just included as an example
+/*
+  fun setPassword(username: String, oldPassword: String, newPassword: String) {
+    if (authenticate(username, oldPassword) != null) {
+      val newSalt = BCrypt.gensalt()
+      val newHashedPassword = BCrypt.hashpw(newSalt, newPassword)
+      // Update the user salt and password
+    }
+  }
+*/
 }

@@ -16,12 +16,13 @@ import java.util.*
 import kotlin.concurrent.thread
 
 
+// TODO routing: Should I change /api/* to /api/{version}/* ?
 object Admin {
   object Uri {
-    const val LIVENESS  = "/admin/liveness"
-    const val READINESS = "/admin/readiness"
-    const val METADATA  = "/admin/metadata"
-    const val KILL      = "/admin/stop"
+    const val LIVENESS    = "/api/admin/liveness"
+    const val READINESS   = "/api/admin/readiness"
+    const val METADATA    = "/api/admin/metadata"
+    const val KILL        = "/api/admin/stop"
   }
 }
 
@@ -29,13 +30,14 @@ object ServiceController {
 
   val accessManager: AccessManager = { handler, ctx, permittedRoles ->
     val effectivePermitedRoles = if (permittedRoles.isEmpty()) GrantedFor.loggedInUsers else permittedRoles
+    // sessionizeUser filter should have authenticated creds and stored user in session
     val user = ctx.sessionAttribute<User?>("curUser")
-    val name = user?.name ?: "anonymous"
     val role = user?.role ?: AppRole.ANONYMOUS
     if (effectivePermitedRoles.contains(role)) handler.handle(ctx)
     else {
-      println("*** Access denied to '${ctx.matchedPath()}' for user '$name' with role '$role'")
-      ctx.status(401).result("Unauthorized")
+      println("*** Access denied to '${ctx.matchedPath()}' for user '${user?.name ?: "anonymous"}' with role '$role'")
+      // Capture it with a Content-Type:"html" specific 401 error filter, to redirect to login or unauthorized page
+      ctx.status(401).result("Unauthorized\n")
     }
   }
 

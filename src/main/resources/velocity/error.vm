@@ -1,0 +1,8 @@
+#parse("/velocity/layout.vm")
+#@mainLayout()
+<h1>$msg.get("ERROR", $matchedPath)</h1>
+#if($exception)
+<h2>Exception:</h2>
+<pre>$exception</pre>
+#end
+#end

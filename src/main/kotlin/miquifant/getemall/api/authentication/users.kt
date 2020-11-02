@@ -8,6 +8,7 @@ package miquifant.getemall.api.authentication
 import miquifant.getemall.utils.AppRole
 
 
+// TODO User should have a set of roles, not just one
 data class User(val name: String, val salt: String, val hashedPass: String, val role: AppRole)
 
 /**
