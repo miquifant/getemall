@@ -6,6 +6,7 @@
  */
 package miquifant.getemall
 
+import miquifant.getemall.api.startServer
 import miquifant.getemall.command.*
 import miquifant.getemall.utils.retrieveAppMetadata
 
@@ -43,8 +44,7 @@ fun main(args: Array<String>) {
   val opts: Opts = parseOpts(args)
 
   if (opts["serve"] as Boolean) {
-    TODO("$opts")
-    //startServer(opts)
+    startServer(opts)
   }
   else {
     val exitStatus = when {
