@@ -18,10 +18,24 @@ import kotlin.concurrent.thread
 
 object Admin {
   object Uri {
-    const val LIVENESS  = "/admin/liveness"
-    const val READINESS = "/admin/readiness"
-    const val METADATA  = "/admin/metadata"
-    const val KILL      = "/admin/stop"
+    const val LOGIN_STATE = "/api/admin/loginState"
+    const val LIVENESS    = "/api/admin/liveness"
+    const val READINESS   = "/api/admin/readiness"
+    const val METADATA    = "/api/admin/metadata"
+    const val KILL        = "/api/admin/stop"
+  }
+}
+
+data class LoginState(val authFailed: Boolean,
+                      val authSucceeded: Boolean,
+                      val loggedOut: Boolean,
+                      val redirect: String?)
+{
+  companion object {
+    const val AUTH_FAILED    = "loginState.authFailed"
+    const val AUTH_SUCCEEDED = "loginState.authSucceeded"
+    const val LOGGED_OUT     = "loginState.loggedOut"
+    const val REDIRECT       = "loginState.redirect"
   }
 }
 
@@ -29,13 +43,14 @@ object ServiceController {
 
   val accessManager: AccessManager = { handler, ctx, permittedRoles ->
     val effectivePermitedRoles = if (permittedRoles.isEmpty()) GrantedFor.loggedInUsers else permittedRoles
+    // sessionizeUser filter should have authenticated creds and stored user in session
     val user = ctx.sessionAttribute<User?>("curUser")
-    val name = user?.name ?: "anonymous"
     val role = user?.role ?: AppRole.ANONYMOUS
     if (effectivePermitedRoles.contains(role)) handler.handle(ctx)
     else {
-      println("*** Access denied to '${ctx.matchedPath()}' for user '$name' with role '$role'")
-      ctx.status(401).result("Unauthorized")
+      println("*** Access denied to '${ctx.matchedPath()}' for user '${user?.name ?: "anonymous"}' with role '$role'")
+      // Capture it with a Content-Type:"html" specific 401 error filter, to redirect to login or unauthorized page
+      ctx.status(401).result("Unauthorized\n")
     }
   }
 
@@ -49,6 +64,13 @@ object ServiceController {
     val user = ctx.sessionAttribute<User?>("curUser")?.name ?: "anonymous"
 
     println("""$ip [$date] "$action $uri $protocol" $status - $user""")
+  }
+
+  val javalinVueState: JavalinState = { ctx ->
+    mapOf (
+        "currentUser" to ctx.sessionAttribute<User?>("curUser")?.name,
+        "currentRole" to ctx.sessionAttribute<User?>("curUser")?.role
+    )
   }
 
   val exceptionHandler: ExceptionHandler = { e, ctx ->
@@ -71,11 +93,28 @@ object ServiceController {
   // ----------------------------------------------------------------------------------------------
   // Endpoint Handlers
   // ----------------------------------------------------------------------------------------------
+  val loginState: Handler = { ctx ->
+
+    val authFailed = ctx.sessionAttribute(LoginState.AUTH_FAILED) ?: false
+    ctx.sessionAttribute(LoginState.AUTH_FAILED, null)
+
+    val authSucceeded = ctx.sessionAttribute(LoginState.AUTH_SUCCEEDED) ?: false
+    ctx.sessionAttribute(LoginState.AUTH_SUCCEEDED, null)
+
+    val loggedOut = ctx.sessionAttribute(LoginState.LOGGED_OUT) ?: false
+    ctx.sessionAttribute(LoginState.LOGGED_OUT, null)
+
+    val loginRedirect = ctx.sessionAttribute<String?>(LoginState.REDIRECT)
+    ctx.sessionAttribute(LoginState.REDIRECT, null)
+
+    ctx.json(LoginState(authFailed, authSucceeded, loggedOut, loginRedirect))
+  }
+
   val liveness: Handler = { ctx ->
     ctx.result("getemall is alive\n")
   }
   val readiness: Handler = { ctx ->
-    // TODO Implement here all needed checks
+    // Add here all necessary checks
     ctx.result("getemall is ready\n")
   }
   val metadata: Handler = { ctx ->

@@ -48,6 +48,7 @@ dependencies {
   compile("io.javalin", "javalin", "3.11.0")
   compile("org.mindrot", "jbcrypt", "0.3m")
   compile("org.slf4j", "slf4j-simple", "1.7.25")
+  compile("org.webjars.npm", "vue", "2.6.10")
 
   // App test dependencies
   testCompile("com.github.stefanbirkner", "system-rules", "1.17.0")

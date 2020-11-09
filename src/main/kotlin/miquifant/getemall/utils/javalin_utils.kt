@@ -16,6 +16,7 @@ typealias Handler = (Context) -> Unit
 typealias ExceptionHandler = (Exception, Context) -> Unit
 typealias AccessManager = (Handler, Context, Set<Role>) -> Unit
 typealias RequestLogger = (Context, Float) -> Unit
+typealias JavalinState = (Context) -> Any
 
 enum class AppRole: Role {
   ANONYMOUS, REGULAR_USER, ADMIN
