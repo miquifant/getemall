@@ -13,6 +13,7 @@ import miquifant.getemall.api.controller.Web
 import miquifant.getemall.command.Opts
 import miquifant.getemall.command.loadFullConfig
 import miquifant.getemall.utils.GrantedFor
+import miquifant.getemall.utils.retrieveAppMetadata
 
 import com.typesafe.config.Config
 import io.javalin.Javalin
@@ -22,7 +23,6 @@ import io.javalin.plugin.rendering.vue.VueComponent
 
 
 const val DEFAULT_PORT = 8080
-
 
 fun startServer(opts: Opts): Javalin {
 
@@ -44,6 +44,9 @@ fun startServer(opts: Opts): Javalin {
     conf.enableWebjars()
 
     JavalinVue.stateFunction = ServiceController.javalinVueState
+
+    val isDev = retrieveAppMetadata().version == "test-version"
+    JavalinVue.isDevFunction = { isDev }
 
   }.apply {
 

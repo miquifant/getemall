@@ -12,15 +12,17 @@ plugins {
   // Apply the Kotlin JVM plugin to add support for Kotlin.
   id("org.jetbrains.kotlin.jvm") version "1.3.41"
 
+  // Apply the shadow plugin to add support for creating an uber-jar with all application.
+  id("com.github.johnrengelman.shadow") version "5.2.0"
+
   // Apply the application plugin to add support for building a CLI application.
   application
 }
 
 apply {
-  from("$projectDir/gradle/application.gradle.kts")
-  from("$projectDir/gradle/distribution.gradle.kts")
   from("$projectDir/gradle/info.gradle.kts")
   from("$projectDir/gradle/manifest.gradle.kts")
+  from("$projectDir/gradle/shadow.gradle.kts")
   from("$projectDir/gradle/testing.gradle.kts")
 }
 
