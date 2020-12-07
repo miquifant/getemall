@@ -5,6 +5,7 @@
  */
 package miquifant.getemall.api.authentication.impl
 
+import miquifant.getemall.log.LoggerFactory
 import miquifant.getemall.utils.AppRole
 
 import org.mindrot.jbcrypt.BCrypt
@@ -16,6 +17,8 @@ import kotlin.test.assertNull
 
 
 class TestUsersList {
+
+  private val logger = LoggerFactory.logger(TestUsersList::class.java.canonicalName)
 
   @Test
   fun testGetUserByUsername() {
@@ -52,9 +55,9 @@ class TestUsersList {
 
     val usersDao = UserListDao()
 
-    assertNull(usersDao.authenticate(existingName, wrongPassword), "User shouldn't be authenticated")
+    assertNull(usersDao.authenticate(existingName, wrongPassword, logger), "User shouldn't be authenticated")
 
-    val user = usersDao.authenticate(existingName, rightPassword)
+    val user = usersDao.authenticate(existingName, rightPassword, logger)
     assertNotNull(user, "User should authenticate")
     assertEquals(existingName, user.name)
     assertEquals(existingSalt, user.salt)

@@ -7,6 +7,7 @@ package miquifant.getemall.api.authentication.impl
 
 import miquifant.getemall.api.authentication.User
 import miquifant.getemall.api.authentication.UserDao
+import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.utils.AppRole.ADMIN
 import miquifant.getemall.utils.AppRole.REGULAR_USER
 
@@ -21,22 +22,31 @@ class UserListDao: UserDao {
       User("esther", "$2a$10\$e0MYzXyjpJS7Pd0RVvHwHe", "$2a$10\$e0MYzXyjpJS7Pd0RVvHwHe1HlCS4bZJ18JuywdEMLT83E1KDmUhCy", REGULAR_USER),
       User("ramon",  "$2a$10\$E3DgchtVry3qlYlzJCsyxe", "$2a$10\$E3DgchtVry3qlYlzJCsyxeSK0fftK4v0ynetVCuDdxGVl1obL.ln2", REGULAR_USER)
   )
+
   override fun getUserByUsername(username: String): User? {
     return users.stream().filter { b -> b.name == username }.findFirst().orElse(null)
   }
+
   /**
    * Authenticate the user by hashing the inputted password using the stored salt,
    * then comparing the generated hashed password to the stored hashed password.
    */
-  override fun authenticate(username: String?, password: String?): User? {
+  override fun authenticate(username: String?, password: String?, accessLogger: Logger): User? {
     return if (username == null || password == null) null
     else if (username == "admin" && password == "admin") User(username, "", "", ADMIN)
     else {
       val user = getUserByUsername(username)
+      val errorMessage = "Login denied for username '$username'. Bad username or password"
       when {
-        user == null -> null
+        user == null -> {
+          accessLogger.info { errorMessage }
+          null
+        }
         BCrypt.hashpw(password, user.salt) == user.hashedPass -> user
-        else -> null
+        else -> {
+          accessLogger.info { errorMessage }
+          null
+        }
       }
     }
   }

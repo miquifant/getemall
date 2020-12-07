@@ -1,1 +1,1 @@
-#export SOME_VAR=some-value
+export GETEMALL_API_LOG=${GETEMALL_API_HOME}/log

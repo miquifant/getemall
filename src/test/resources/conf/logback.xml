@@ -1,0 +1,39 @@
+<configuration>
+
+  <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator class="miquifant.getemall.log.LoggerNameBasedDiscriminator"/>
+    <sift>
+      <appender class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+          <pattern>%-30(%logger{32}.log): %d{YYYY-MM-dd HH:mm:ss} %-5level %msg%n%rEx</pattern>
+        </encoder>
+      </appender>
+    </sift>
+  </appender>
+
+  <appender name="APPLOG" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator class="miquifant.getemall.log.LoggerNameBasedDiscriminator"/>
+    <sift>
+      <appender class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+          <pattern>%-30(%logger{32}.log): %d{YYYY-MM-dd HH:mm:ss} %msg%n%rEx</pattern>
+        </encoder>
+      </appender>
+    </sift>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="SIFT" />
+  </root>
+
+  <logger name="AccessManager" level="INFO" additivity="false">
+    <appender-ref ref="APPLOG" />
+  </logger>
+
+  <logger name="NavigationLog" level="INFO" additivity="false">
+    <appender-ref ref="APPLOG" />
+  </logger>
+
+  <logger name="org.eclipse.jetty" level="WARN" />
+
+</configuration>

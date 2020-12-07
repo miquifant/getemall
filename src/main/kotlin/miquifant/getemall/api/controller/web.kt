@@ -7,6 +7,7 @@ package miquifant.getemall.api.controller
 
 import miquifant.getemall.api.authentication.User
 import miquifant.getemall.api.authentication.UserDao
+import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.utils.AppRole.ANONYMOUS
 import miquifant.getemall.utils.Handler
 
@@ -37,11 +38,11 @@ object Web {
 
 object LoginController {
 
-  val handleLoginPost: (UserDao) -> Handler = { userDao ->
+  val handleLoginPost: (UserDao, Logger) -> Handler = { userDao, accessLogger ->
     { ctx ->
 
       val loginRedirect = ctx.formParam("redirect")
-      val user = userDao.authenticate(ctx.formParam("username"), ctx.formParam("password"))
+      val user = userDao.authenticate(ctx.formParam("username"), ctx.formParam("password"), accessLogger)
 
       if (user == null) {
         ctx.sessionAttribute(LoginState.AUTH_FAILED, true)

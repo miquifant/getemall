@@ -17,13 +17,17 @@ tasks.named<CreateStartScripts>("startShadowScripts") {
 
   // Change the code of the unix script and delete windows one
   doLast {
+    val collectArgs = Regex("^eval set -- .* -jar .*")
+
     windowsScript.delete()
 
     unixScript.writeText("""
       |# Don't call this script directly. Use `getemall-api` script instead.
       |#
       |""".trimMargin().trimStart() +
-        unixScript.readText()
+        unixScript.readLines().joinToString("\n") { line ->
+          if (line.matches(collectArgs)) line.replace(" -jar ", " \"\$GETEMALL_OPTS\" -jar ") else line
+        }
     )
   }
 }

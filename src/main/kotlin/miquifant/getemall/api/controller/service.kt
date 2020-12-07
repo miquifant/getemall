@@ -7,11 +7,11 @@ package miquifant.getemall.api.controller
 
 import miquifant.getemall.api.authentication.User
 import miquifant.getemall.api.authentication.UserDao
+import miquifant.getemall.log.Loggable.Logger
+import miquifant.getemall.log.LoggerFactory
 import miquifant.getemall.utils.*
 
 import io.javalin.Javalin
-
-import java.util.*
 
 import kotlin.concurrent.thread
 
@@ -41,29 +41,36 @@ data class LoginState(val authFailed: Boolean,
 
 object ServiceController {
 
-  val accessManager: AccessManager = { handler, ctx, permittedRoles ->
-    val effectivePermitedRoles = if (permittedRoles.isEmpty()) GrantedFor.loggedInUsers else permittedRoles
-    // sessionizeUser filter should have authenticated creds and stored user in session
-    val user = ctx.sessionAttribute<User?>("curUser")
-    val role = user?.role ?: AppRole.ANONYMOUS
-    if (effectivePermitedRoles.contains(role)) handler.handle(ctx)
-    else {
-      println("*** Access denied to '${ctx.matchedPath()}' for user '${user?.name ?: "anonymous"}' with role '$role'")
-      // Capture it with a Content-Type:"html" specific 401 error filter, to redirect to login or unauthorized page
-      ctx.status(401).result("Unauthorized\n")
+  private val logger = LoggerFactory.logger(ServiceController::class.java.canonicalName)
+
+  val accessManager: (Logger) -> AccessManager = { accessLogger ->
+    { handler, ctx, permittedRoles ->
+      val effectivePermitedRoles = if (permittedRoles.isEmpty()) GrantedFor.loggedInUsers else permittedRoles
+      // sessionizeUser filter should have authenticated creds and stored user in session
+      val user = ctx.sessionAttribute<User?>("curUser")
+      val role = user?.role ?: AppRole.ANONYMOUS
+      if (effectivePermitedRoles.contains(role)) handler.handle(ctx)
+      else {
+        accessLogger.info {
+          "Access denied to '${ctx.matchedPath()}' for user '${user?.name ?: "anonymous"}' with role '$role'"
+        }
+        // Capture it with a Content-Type:"html" specific 401 error filter, to redirect to login or unauthorized page
+        ctx.status(401).result("Unauthorized\n")
+      }
     }
   }
 
-  val requestLogger: RequestLogger = { ctx, _ ->
-    val ip = ctx.ip()
-    val date = formatISO8601Date(Date())
-    val action = ctx.req.method
-    val uri = ctx.req.requestURI
-    val protocol = ctx.protocol()
-    val status = ctx.res.status
-    val user = ctx.sessionAttribute<User?>("curUser")?.name ?: "anonymous"
+  val requestLogger: (Logger) -> RequestLogger = { navigationLogger ->
+    { ctx, _ ->
+      val ip = ctx.ip()
+      val action = ctx.req.method
+      val uri = ctx.req.requestURI
+      val protocol = ctx.protocol()
+      val status = ctx.res.status
+      val user = ctx.sessionAttribute<User?>("curUser")?.name ?: "anonymous"
 
-    println("""$ip [$date] "$action $uri $protocol" $status - $user""")
+      navigationLogger.info { """$ip "$action $uri $protocol" $status - $user""" }
+    }
   }
 
   val javalinVueState: JavalinState = { ctx ->
@@ -74,17 +81,17 @@ object ServiceController {
   }
 
   val exceptionHandler: ExceptionHandler = { e, ctx ->
-    e.printStackTrace()
+    logger.errorWithThrowable(e) { "An error occurred: ${e.message}" }
     ctx.status(500).json(e)
   }
 
   /**
    * Stores in session running user based on request
    */
-  val sessionizeUser: (UserDao) -> Handler = { userDao ->
+  val sessionizeUser: (UserDao, Logger) -> Handler = { userDao, accessLogger ->
     { ctx ->
       val user: User? = if (ctx.basicAuthCredentialsExist())
-        userDao.authenticate(ctx.basicAuthCredentials().username, ctx.basicAuthCredentials().password)
+        userDao.authenticate(ctx.basicAuthCredentials().username, ctx.basicAuthCredentials().password, accessLogger)
       else null
       if (user != null && ctx.sessionAttribute<User?>("curUser") != user) ctx.sessionAttribute("curUser", user)
     }
@@ -123,6 +130,7 @@ object ServiceController {
   val kill: (Javalin) -> Handler = { app ->
     { ctx ->
       ctx.result("bye!\n")
+      logger.info { "Service stopped by '${ctx.sessionAttribute<User?>("curUser")?.name ?: "anonymous"}'" }
       thread { app.stop() }
     }
   }
