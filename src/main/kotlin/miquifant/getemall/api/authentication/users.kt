@@ -5,6 +5,7 @@
  */
 package miquifant.getemall.api.authentication
 
+import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.utils.AppRole
 
 
@@ -23,5 +24,5 @@ interface UserDao {
   /**
    * Checks username and password in the Users list and returns the matching one or null
    */
-  fun authenticate(username: String?, password: String?): User?
+  fun authenticate(username: String?, password: String?, accessLogger: Logger): User?
 }

@@ -37,6 +37,8 @@ dependencies {
   // Use the Kotlin JDK 8 standard library.
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+  implementation("org.jetbrains.kotlin:kotlin-reflect")
+
   // Use the Kotlin test library.
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 
@@ -44,6 +46,7 @@ dependencies {
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 
   // App dependencies
+  compile("ch.qos.logback", "logback-classic", "1.2.3")
   compile("com.fasterxml.jackson.core", "jackson-databind", "2.10.3")
   compile("com.offbytwo", "docopt", "0.6.0.20150202")
   compile("com.typesafe", "config", "1.3.4")

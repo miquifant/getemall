@@ -1,3 +1,4 @@
+@file:JvmName("GetemallServer")
 /**
  * Entry point for getemall's REST API, and start server function.
  *
@@ -12,6 +13,7 @@ import miquifant.getemall.api.controller.ServiceController
 import miquifant.getemall.api.controller.Web
 import miquifant.getemall.command.Opts
 import miquifant.getemall.command.loadFullConfig
+import miquifant.getemall.log.LoggerFactory
 import miquifant.getemall.utils.GrantedFor
 import miquifant.getemall.utils.retrieveAppMetadata
 
@@ -23,6 +25,10 @@ import io.javalin.plugin.rendering.vue.VueComponent
 
 
 const val DEFAULT_PORT = 8080
+
+private val logger           = LoggerFactory.logger("GetemallServer")
+private val accessLogger     = LoggerFactory.logger("AccessManager")
+private val navigationLogger = LoggerFactory.logger("NavigationLog")
 
 fun startServer(opts: Opts): Javalin {
 
@@ -36,29 +42,35 @@ fun startServer(opts: Opts): Javalin {
 
   return Javalin.create { conf ->
 
+    val isDev = retrieveAppMetadata().version == "test-version"
+    logger.info { "Application starting in ${if (isDev) "development" else "production"} mode" }
+    JavalinVue.isDevFunction = { isDev }
+
+    logger.debug { "Configuring javalin..." }
+
     // Configure service
     conf.defaultContentType = "application/json; charset=utf-8"
     conf.addStaticFiles("assets", Location.CLASSPATH)
-    conf.accessManager(ServiceController.accessManager)
-    conf.requestLogger(ServiceController.requestLogger)
+    conf.accessManager(ServiceController.accessManager(accessLogger))
+    conf.requestLogger(ServiceController.requestLogger(navigationLogger))
     conf.enableWebjars()
 
+    logger.debug { "Setting javalinVueState function..." }
     JavalinVue.stateFunction = ServiceController.javalinVueState
-
-    val isDev = retrieveAppMetadata().version == "test-version"
-    JavalinVue.isDevFunction = { isDev }
 
   }.apply {
 
     /* =========================================================================================
      *  Define EXCEPTION and ERROR handlers, and General FILTERS
      * ========================================================================================= */
+    logger.debug { "Defining error handlers and filters..." }
     exception(Exception::class.java, ServiceController.exceptionHandler)
-    before (ServiceController.sessionizeUser(userDao))
+    before (ServiceController.sessionizeUser(userDao, accessLogger))
 
     /* =========================================================================================
      *  Endpoints
      * ========================================================================================= */
+    logger.debug { "Defining API endpoints..." }
     get  ("/",                   ServiceController.liveness,   GrantedFor.anyone)
     get  (Admin.Uri.LOGIN_STATE, ServiceController.loginState, GrantedFor.anyone)
     get  (Admin.Uri.LIVENESS,    ServiceController.liveness,   GrantedFor.anyone)
@@ -69,14 +81,16 @@ fun startServer(opts: Opts): Javalin {
     /* =========================================================================================
      *  Web
      * ========================================================================================= */
+    logger.debug { "Defining WEB error handlers..." }
     // Just some error handler examples
     error (404, "html", VueComponent("not-found"))
     error (401, "html", Web.unauthorized)
 
-    get  (Web.Uri.INDEX,  VueComponent("index"),                    GrantedFor.anyone)
-    get  (Web.Uri.LOGIN,  VueComponent("login"),                    GrantedFor.anyone)
-    post (Web.Uri.LOGIN,  LoginController.handleLoginPost(userDao), GrantedFor.anyone)
-    post (Web.Uri.LOGOUT, LoginController.handleLogoutPost,         GrantedFor.anyone)
+    logger.debug { "Defining WEB pages..." }
+    get  (Web.Uri.INDEX,  VueComponent("index"),                                  GrantedFor.anyone)
+    get  (Web.Uri.LOGIN,  VueComponent("login"),                                  GrantedFor.anyone)
+    post (Web.Uri.LOGIN,  LoginController.handleLoginPost(userDao, accessLogger), GrantedFor.anyone)
+    post (Web.Uri.LOGOUT, LoginController.handleLogoutPost,                       GrantedFor.anyone)
 
     get  (Web.Uri.VIEW1, VueComponent("view-1"), GrantedFor.anyone)
     get  (Web.Uri.VIEW2, VueComponent("view-2"), GrantedFor.loggedInUsers)
