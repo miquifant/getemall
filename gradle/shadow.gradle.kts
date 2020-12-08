@@ -13,7 +13,7 @@
 tasks.named<CreateStartScripts>("startShadowScripts") {
 
   // Change the name of the script
-  applicationName = "run-getemall-api"
+  applicationName = "run-getemall"
 
   // Change the code of the unix script and delete windows one
   doLast {
@@ -22,7 +22,7 @@ tasks.named<CreateStartScripts>("startShadowScripts") {
     windowsScript.delete()
 
     unixScript.writeText("""
-      |# Don't call this script directly. Use `getemall-api` script instead.
+      |# Don't call this script directly. Use `getemall` script instead.
       |#
       |""".trimMargin().trimStart() +
         unixScript.readLines().joinToString("\n") { line ->
@@ -48,7 +48,7 @@ tasks.named<Zip>("shadowDistZip") {
   archiveBaseName.value(project.name)
   into (project.name + "-" + project.version) {
     from(".")
-    include("bin/getemall-api")
+    include("bin/getemall")
     include("conf/*")
   }
 }

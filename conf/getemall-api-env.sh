@@ -1,1 +1,0 @@
-export GETEMALL_API_LOG=${GETEMALL_API_HOME}/log

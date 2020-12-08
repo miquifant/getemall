@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+export GETEMALL_HOME
+export GETEMALL_CURR
+export GETEMALL_CONF
+
+GETEMALL_HOME=$(readlink -e $0)
+GETEMALL_HOME=$(dirname ${GETEMALL_HOME})
+GETEMALL_HOME=$(cd "${GETEMALL_HOME}/.."; pwd)
+
+GETEMALL_CURR=$(pwd)
+
+GETEMALL_CONF=${GETEMALL_HOME}/conf
+source ${GETEMALL_CONF}/getemall-env.sh
+
+export GETEMALL_OPTS="\
+  -Dlogback.configurationFile=${GETEMALL_CONF}/logback.xml\
+  -Dgetemall.logDir=${GETEMALL_LOG}"
+
+${GETEMALL_HOME}/bin/run-getemall "$@"

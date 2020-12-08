@@ -1,6 +1,6 @@
 @file:JvmName("Main")
 /**
- * Getemall-API entry point.
+ * Getemall entry point.
  *
  * Created by miquifant on 2020-10-18
  */
@@ -17,19 +17,19 @@ private val metadata = retrieveAppMetadata()
 
 private val banner: Banner = arrayOf(
     "--------------------------------------------------------------------------",
-    " Getemall-API version ${metadata.version} (${metadata.date})",
+    " Getemall version ${metadata.version} (${metadata.date})",
     " Compiled by ${metadata.user}@${metadata.machine}",
     "--------------------------------------------------------------------------"
 )
 
 // Usage document
 private val doc = """
-  |Getemall-API ${metadata.version}
+  |Getemall ${metadata.version}
   |
   | Usage:
-  |   getemall-api serve
-  |   getemall-api help | -h | --help
-  |   getemall-api version | --version
+  |   getemall serve
+  |   getemall help | -h | --help
+  |   getemall version | --version
   |
   | Options:
   |   --version                Show version.

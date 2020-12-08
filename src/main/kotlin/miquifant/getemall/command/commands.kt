@@ -26,8 +26,8 @@ const val OS_ERROR = 1
  * Environment variables accessed from code
  */
 object EnvVars {
-  const val APP_CONF = "GETEMALL_API_CONF"
-  const val APP_CURR = "GETEMALL_API_CURR"
+  const val APP_CONF = "GETEMALL_CONF"
+  const val APP_CURR = "GETEMALL_CURR"
   const val PWD      = "PWD"
 }
 
@@ -44,7 +44,7 @@ private fun appCurrentDirConfigValue(env: Config): ConfigValue =
 private fun loadAppConfig(env: Config): Config =
     if(env.hasPath(EnvVars.APP_CONF)) {
       val appConf   = env.getString(EnvVars.APP_CONF)
-      val confFile  = "getemall-api.conf"
+      val confFile  = "getemall.conf"
       val appConfig = ConfigFactory.parseFile(File("$appConf/$confFile"))
       ConfigFactory.load(appConfig)
     } else {
@@ -83,7 +83,7 @@ class NotYetImplementedCommand (command: String): Command(command) {
    * @exception kotlin.NotImplementedError
    */
   override fun execute(): ExitStatus {
-    TODO("Getemall-API command not yet implemented: '$name'")
+    TODO("Getemall command not yet implemented: '$name'")
   }
 }
 
