@@ -1,12 +1,12 @@
 /**
- * getemall API project
+ * getemall project
  *
  * Created by miquifant on 2020-10-17
  */
 group = "miquifant.getemall"
 version = "$version"
 
-description = "getemall API"
+description = "getemall backend and API"
 
 plugins {
   // Apply the Kotlin JVM plugin to add support for Kotlin.

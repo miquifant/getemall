@@ -39,7 +39,7 @@ class TestCommands {
       cmd.execute()
       fail("Not implemented commands should throw an exception")
     } catch (e: NotImplementedError) {
-      assertEquals("An operation is not implemented: Getemall-API command not yet implemented: 'command'", e.message)
+      assertEquals("An operation is not implemented: Getemall command not yet implemented: 'command'", e.message)
     }
   }
 

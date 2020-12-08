@@ -1,5 +1,5 @@
 /**
- * Test getemall-api utillity functions.
+ * Test getemall utillity functions.
  *
  * Created by miquifant on 2020-10-18
  */

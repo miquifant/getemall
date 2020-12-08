@@ -1,0 +1,1 @@
+export GETEMALL_LOG=${GETEMALL_HOME}/log

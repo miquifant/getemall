@@ -1,1 +1,1 @@
-rootProject.name = "getemall-api"
+rootProject.name = "getemall"
