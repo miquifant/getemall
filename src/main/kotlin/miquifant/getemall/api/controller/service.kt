@@ -7,6 +7,8 @@ package miquifant.getemall.api.controller
 
 import miquifant.getemall.api.authentication.User
 import miquifant.getemall.api.authentication.UserDao
+import miquifant.getemall.api.controller.ComponentStatus.DOWN
+import miquifant.getemall.api.controller.ComponentStatus.OK
 import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.log.LoggerFactory
 import miquifant.getemall.utils.*
@@ -26,22 +28,44 @@ object Admin {
   }
 }
 
-data class LoginState(val authFailed: Boolean,
+data class LoginState(val authError: Boolean,
+                      val authFailed: Boolean,
                       val authSucceeded: Boolean,
                       val loggedOut: Boolean,
                       val redirect: String?)
 {
   companion object {
-    const val AUTH_FAILED    = "loginState.authFailed"
+    const val AUTH_ERROR     = "loginState.authError"     // Log in service failed
+    const val AUTH_FAILED    = "loginState.authFailed"    // Wrong username or password
     const val AUTH_SUCCEEDED = "loginState.authSucceeded"
     const val LOGGED_OUT     = "loginState.loggedOut"
     const val REDIRECT       = "loginState.redirect"
   }
 }
 
+enum class ComponentStatus { OK, DOWN }
+
+data class ComponentCheck(val status: ComponentStatus,
+                          val message: String? = null)
+
+data class ServiceCheck(val status: ComponentStatus,
+                        val components: Map<String, ComponentCheck>,
+                        val message: String? = null)
+
 object ServiceController {
 
   private val logger = LoggerFactory.logger(ServiceController::class.java.canonicalName)
+
+  fun checkLogin(dao: UserDao): ComponentCheck = try {
+
+    dao.getUserByUsername("admin")
+
+    ComponentCheck(OK)
+  } catch (e: Exception) {
+    val msg = "Login component not ready"
+    logger.errorWithThrowable(e) { msg }
+    ComponentCheck(DOWN, msg)
+  }
 
   val accessManager: (Logger) -> AccessManager = { accessLogger ->
     { handler, ctx, permittedRoles ->
@@ -102,6 +126,9 @@ object ServiceController {
   // ----------------------------------------------------------------------------------------------
   val loginState: Handler = { ctx ->
 
+    val authError = ctx.sessionAttribute(LoginState.AUTH_ERROR) ?: false
+    ctx.sessionAttribute(LoginState.AUTH_ERROR, null)
+
     val authFailed = ctx.sessionAttribute(LoginState.AUTH_FAILED) ?: false
     ctx.sessionAttribute(LoginState.AUTH_FAILED, null)
 
@@ -114,19 +141,36 @@ object ServiceController {
     val loginRedirect = ctx.sessionAttribute<String?>(LoginState.REDIRECT)
     ctx.sessionAttribute(LoginState.REDIRECT, null)
 
-    ctx.json(LoginState(authFailed, authSucceeded, loggedOut, loginRedirect))
+    ctx.json(LoginState(authError, authFailed, authSucceeded, loggedOut, loginRedirect))
   }
 
   val liveness: Handler = { ctx ->
-    ctx.result("getemall is alive\n")
+    ctx.json(ComponentCheck(OK, "getemall is alive"))
   }
-  val readiness: Handler = { ctx ->
-    // Add here all necessary checks
-    ctx.result("getemall is ready\n")
+
+  val readiness: (UserDao) -> Handler = { userDao ->
+    { ctx ->
+
+      // Check Login state
+      val loginStatus: ComponentCheck = checkLogin(userDao)
+
+      // Gather all component statuses
+      val components = mapOf (
+          "login_check" to loginStatus
+      )
+      val serviceStatus = if (components.values.any { check -> check.status == DOWN }) DOWN else OK
+      ctx.json(ServiceCheck(
+          status = serviceStatus,
+          components = components,
+          message = "Service ${if (serviceStatus == OK) "is" else "NOT" } ready"
+      ))
+    }
   }
+
   val metadata: Handler = { ctx ->
     ctx.json(retrieveAppMetadata())
   }
+
   val kill: (Javalin) -> Handler = { app ->
     { ctx ->
       ctx.result("bye!\n")
