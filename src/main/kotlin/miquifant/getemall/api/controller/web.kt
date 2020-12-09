@@ -42,10 +42,16 @@ object LoginController {
     { ctx ->
 
       val loginRedirect = ctx.formParam("redirect")
-      val user = userDao.authenticate(ctx.formParam("username"), ctx.formParam("password"), accessLogger)
+      val (succeeded, user) = try {
 
+        Pair(true, userDao.authenticate(ctx.formParam("username"), ctx.formParam("password"), accessLogger))
+
+      } catch (e: Exception) {
+        Pair(false, null)
+      }
       if (user == null) {
-        ctx.sessionAttribute(LoginState.AUTH_FAILED, true)
+        if (succeeded) ctx.sessionAttribute(LoginState.AUTH_FAILED, true)
+        else ctx.sessionAttribute(LoginState.AUTH_ERROR, true)
         ctx.sessionAttribute(LoginState.REDIRECT, loginRedirect)
         ctx.redirect(Web.Uri.LOGIN)
       }

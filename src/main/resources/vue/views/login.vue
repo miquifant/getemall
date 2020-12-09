@@ -1,6 +1,7 @@
     <template id="login">
       <app-frame>
         <form id="loginForm" method="post">
+          <p v-if="loginState.authError" class="verybad notification">Can't log in at the moment. We are having problems.</p>
           <p v-if="loginState.authFailed" class="bad notification">The login information you supplied was incorrect.</p>
           <p v-if="loginState.authSucceeded" class="good notification">Authentication Succeeded.</p>
           <p v-if="loginState.loggedOut" class="notification">You have been logged out.</p>
@@ -65,5 +66,10 @@
       }
       .bad.notification {
         background: #bb0000;
+      }
+      .verybad.notification {
+        background: white;
+        color: red;
+        border: solid 3px red;
       }
     </style>

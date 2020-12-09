@@ -74,7 +74,7 @@ fun startServer(opts: Opts): Javalin {
     get  ("/",                   ServiceController.liveness,   GrantedFor.anyone)
     get  (Admin.Uri.LOGIN_STATE, ServiceController.loginState, GrantedFor.anyone)
     get  (Admin.Uri.LIVENESS,    ServiceController.liveness,   GrantedFor.anyone)
-    get  (Admin.Uri.READINESS,   ServiceController.readiness,  GrantedFor.anyone)
+    get  (Admin.Uri.READINESS,   ServiceController.readiness(userDao), GrantedFor.anyone)
     get  (Admin.Uri.METADATA,    ServiceController.metadata,   GrantedFor.anyone)
     post (Admin.Uri.KILL,        ServiceController.kill(this), GrantedFor.admins)
 
