@@ -18,7 +18,7 @@ import kotlin.test.assertNull
 
 class TestUsersList {
 
-  private val logger = LoggerFactory.logger(TestUsersList::class.java.canonicalName)
+  private val logger = LoggerFactory.logger(this::class.java.canonicalName)
 
   @Test
   fun testGetUserByUsername() {
@@ -46,16 +46,21 @@ class TestUsersList {
   @Test
   fun testAuthenticate() {
 
+    val unexistingName = "unexisting"
     val wrongPassword = "wrong"
-    val rightPassword = "password"
 
     val existingName  = "esther"
+    val rightPassword = "password"
     val existingSalt  = "$2a$10\$e0MYzXyjpJS7Pd0RVvHwHe"
     val existingRole  = AppRole.REGULAR_USER
 
     val usersDao = UserListDao()
 
-    assertNull(usersDao.authenticate(existingName, wrongPassword, logger), "User shouldn't be authenticated")
+    val unexistingUser = usersDao.authenticate(unexistingName, "whatever", logger)
+    assertNull(unexistingUser, "User shouldn't be authenticated")
+
+    val userWithWrongPassword = usersDao.authenticate(existingName, wrongPassword, logger)
+    assertNull(userWithWrongPassword, "User shouldn't be authenticated")
 
     val user = usersDao.authenticate(existingName, rightPassword, logger)
     assertNotNull(user, "User should authenticate")
