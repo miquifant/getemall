@@ -1,5 +1,9 @@
 # Launching application from the IDE
 
+## Setup and start local Database using docker
+
+Move to `${GETEMALL_HOME}/database` directory and follow [these instructions](../../../../database/README.md).
+
 ## Run/Debug configuration
 
 You can configure your IDE to launch application using:
