@@ -67,6 +67,17 @@ object ServiceController {
     ComponentCheck(DOWN, msg)
   }
 
+  fun checkDB(db: ConnectionManager): ComponentCheck = try {
+
+    db()
+
+    ComponentCheck(OK)
+  } catch (e: Exception) {
+    val msg = "Database component not ready"
+    logger.errorWithThrowable(e) { msg }
+    ComponentCheck(DOWN, msg)
+  }
+
   val accessManager: (Logger) -> AccessManager = { accessLogger ->
     { handler, ctx, permittedRoles ->
       val effectivePermitedRoles = if (permittedRoles.isEmpty()) GrantedFor.loggedInUsers else permittedRoles
@@ -115,7 +126,9 @@ object ServiceController {
   val sessionizeUser: (UserDao, Logger) -> Handler = { userDao, accessLogger ->
     { ctx ->
       val user: User? = if (ctx.basicAuthCredentialsExist())
-        userDao.authenticate(ctx.basicAuthCredentials().username, ctx.basicAuthCredentials().password, accessLogger)
+        try {
+          userDao.authenticate(ctx.basicAuthCredentials().username, ctx.basicAuthCredentials().password, accessLogger)
+        } catch (e: Exception) { null }
       else null
       if (user != null && ctx.sessionAttribute<User?>("curUser") != user) ctx.sessionAttribute("curUser", user)
     }
@@ -148,15 +161,19 @@ object ServiceController {
     ctx.json(ComponentCheck(OK, "getemall is alive"))
   }
 
-  val readiness: (UserDao) -> Handler = { userDao ->
+  val readiness: (UserDao, ConnectionManager) -> Handler = { userDao, db ->
     { ctx ->
 
       // Check Login state
       val loginStatus: ComponentCheck = checkLogin(userDao)
 
+      // Check DB state
+      val dbStatus: ComponentCheck = checkDB(db)
+
       // Gather all component statuses
       val components = mapOf (
-          "login_check" to loginStatus
+          "login_check" to loginStatus,
+          "db_check" to dbStatus
       )
       val serviceStatus = if (components.values.any { check -> check.status == DOWN }) DOWN else OK
       ctx.json(ServiceCheck(

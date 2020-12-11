@@ -6,7 +6,7 @@
  */
 package miquifant.getemall.api
 
-import miquifant.getemall.api.authentication.impl.UserListDao
+import miquifant.getemall.api.authentication.impl.UserDatabaseDao
 import miquifant.getemall.api.controller.Admin
 import miquifant.getemall.api.controller.LoginController
 import miquifant.getemall.api.controller.ServiceController
@@ -14,7 +14,9 @@ import miquifant.getemall.api.controller.Web
 import miquifant.getemall.command.Opts
 import miquifant.getemall.command.loadFullConfig
 import miquifant.getemall.log.LoggerFactory
+import miquifant.getemall.utils.ConnectionManager
 import miquifant.getemall.utils.GrantedFor
+import miquifant.getemall.utils.connectionManager
 import miquifant.getemall.utils.retrieveAppMetadata
 
 import com.typesafe.config.Config
@@ -38,7 +40,9 @@ fun startServer(opts: Opts): Javalin {
   )
   val port = if (config.hasPath("api_port")) config.getInt("api_port") else DEFAULT_PORT
 
-  val userDao = UserListDao()
+  val db: ConnectionManager = connectionManager(config)
+
+  val userDao = UserDatabaseDao(db)
 
   return Javalin.create { conf ->
 
@@ -74,7 +78,7 @@ fun startServer(opts: Opts): Javalin {
     get  ("/",                   ServiceController.liveness,   GrantedFor.anyone)
     get  (Admin.Uri.LOGIN_STATE, ServiceController.loginState, GrantedFor.anyone)
     get  (Admin.Uri.LIVENESS,    ServiceController.liveness,   GrantedFor.anyone)
-    get  (Admin.Uri.READINESS,   ServiceController.readiness(userDao), GrantedFor.anyone)
+    get  (Admin.Uri.READINESS,   ServiceController.readiness(userDao, db), GrantedFor.anyone)
     get  (Admin.Uri.METADATA,    ServiceController.metadata,   GrantedFor.anyone)
     post (Admin.Uri.KILL,        ServiceController.kill(this), GrantedFor.admins)
 
