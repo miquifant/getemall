@@ -16,6 +16,7 @@ import miquifant.getemall.utils.ConnectionParams.USER
 import com.typesafe.config.ConfigFactory
 
 import java.io.File
+import java.sql.DriverManager
 
 
 private const val SCHEMA_DEFINITION_FILE = "database/sql/getemall_schema.sql"
@@ -62,4 +63,11 @@ fun initDatabaseConnection(tmpDatabase: String): ConnectionManager {
   statement.closeOnCompletion()
 
   return db
+}
+
+/**
+ * Creates a ConnectionManager which is never ready, by design.
+ */
+fun initUnreadyDatabaseConnection(): ConnectionManager  = {
+  DriverManager.getConnection("please fail")
 }

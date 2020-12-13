@@ -8,10 +8,10 @@ package miquifant.getemall.api.authentication.impl
 import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.log.LoggerFactory
 import miquifant.getemall.testingutils.initDatabaseConnection
+import miquifant.getemall.testingutils.initUnreadyDatabaseConnection
 import miquifant.getemall.utils.AppRole
 import miquifant.getemall.utils.ConnectionManager
 
-import java.sql.DriverManager
 import java.util.*
 
 import kotlin.test.*
@@ -21,12 +21,14 @@ class TestUsersDatabase {
 
   private lateinit var logger: Logger
   private lateinit var db: ConnectionManager
+  private lateinit var unreadyDb: ConnectionManager
   private val tmpDatabase by lazy { "db_${Date().time}" }
 
   @BeforeTest
   fun setup() {
     logger = LoggerFactory.logger(this::class.java.canonicalName)
     db = initDatabaseConnection(tmpDatabase)
+    unreadyDb = initUnreadyDatabaseConnection()
   }
 
   @AfterTest
@@ -46,7 +48,7 @@ class TestUsersDatabase {
     val existingRole2 = AppRole.REGULAR_USER
 
     val usersDao = UserDatabaseDao(db)
-    val unreadyUsersDao = UserDatabaseDao { DriverManager.getConnection("please fail") }
+    val unreadyUsersDao = UserDatabaseDao(unreadyDb)
 
     val unexistingUser = try {
       usersDao.getUserByUsername(unexistingName)
@@ -101,7 +103,7 @@ class TestUsersDatabase {
     val existingRole2  = AppRole.REGULAR_USER
 
     val usersDao = UserDatabaseDao(db)
-    val unreadyUsersDao = UserDatabaseDao { DriverManager.getConnection("please fail") }
+    val unreadyUsersDao = UserDatabaseDao(unreadyDb)
 
     val unexistingUser = try {
       usersDao.authenticate(unexistingName, "whatever", logger)
