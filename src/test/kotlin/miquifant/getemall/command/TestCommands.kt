@@ -23,12 +23,7 @@ class TestCommands {
 
     val apiPort = "api_port"
     assertTrue(config.hasPath(apiPort), "config should define 'api_port' attribute")
-    assertEquals("8888", config.getString(apiPort))
-
-    val existingVarName = "some-attribute"
-    val existingVarValue = "some-value"
-    assertTrue(config.hasPath(existingVarName), "config should have a '$existingVarName' attribute")
-    assertEquals(existingVarValue, config.getString(existingVarName))
+    assertEquals("6789", config.getString(apiPort))
   }
 
   @Test
