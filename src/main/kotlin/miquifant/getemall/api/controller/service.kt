@@ -11,6 +11,7 @@ import miquifant.getemall.api.controller.ComponentStatus.DOWN
 import miquifant.getemall.api.controller.ComponentStatus.OK
 import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.log.LoggerFactory
+import miquifant.getemall.model.ExceptionalResponse
 import miquifant.getemall.utils.*
 
 import io.javalin.Javalin
@@ -90,7 +91,7 @@ object ServiceController {
           "Access denied to '${ctx.matchedPath()}' for user '${user?.name ?: "anonymous"}' with role '$role'"
         }
         // Capture it with a Content-Type:"html" specific 401 error filter, to redirect to login or unauthorized page
-        ctx.status(401).result("Unauthorized\n")
+        ctx.status(401).json(ExceptionalResponse.unauthorized)
       }
     }
   }

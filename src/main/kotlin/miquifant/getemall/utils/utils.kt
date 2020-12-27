@@ -42,3 +42,5 @@ fun retrieveAppMetadata(): AppMetadata {
  */
 fun String.simpleSplit(): Array<String> =
     this.split(Regex(" ")).toList().mapNotNull { e -> if (e.isBlank()) null else e }.toTypedArray()
+
+fun String.toSingleLine(concat: String = "") = this.replace("[ ]*\n[ ]*".toRegex(), concat)
