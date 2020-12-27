@@ -30,6 +30,8 @@ repositories {
   jcenter()
 }
 
+val jacksonVersion = "2.10.3"
+
 dependencies {
   // Align versions of all Kotlin components
   implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -47,13 +49,15 @@ dependencies {
 
   // App dependencies
   compile("ch.qos.logback", "logback-classic", "1.2.3")
-  compile("com.fasterxml.jackson.core", "jackson-databind", "2.10.3")
+  compile("com.fasterxml.jackson.core", "jackson-databind", jacksonVersion)
+  compile("com.fasterxml.jackson.module", "jackson-module-kotlin", jacksonVersion)
   compile("com.offbytwo", "docopt", "0.6.0.20150202")
   compile("com.typesafe", "config", "1.3.4")
   compile("io.javalin", "javalin", "3.11.0")
   compile("org.mariadb.jdbc", "mariadb-java-client", "2.7.0")
   compile("org.mindrot", "jbcrypt", "0.3m")
   compile("org.slf4j", "slf4j-simple", "1.7.25")
+
   compile("org.webjars.npm", "vue", "2.6.10")
 
   // App test dependencies

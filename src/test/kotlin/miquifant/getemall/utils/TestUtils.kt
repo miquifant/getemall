@@ -54,4 +54,12 @@ class TestUtils {
     assertEquals("ccc",  spacesOrgyArray[2])
     assertEquals("dddd", spacesOrgyArray[3])
   }
+
+  @Test
+  fun testToSingleLine() {
+    val multiline = " line 1 \n line 2 "
+
+    assertEquals(" line 1line 2 ",  multiline.toSingleLine())
+    assertEquals(" line 1 line 2 ", multiline.toSingleLine(" "))
+  }
 }
