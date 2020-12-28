@@ -53,8 +53,13 @@ Vue.component("page-header", {
 .header a {
   color: #bbb;
 }
-.header a:hover {
+.header li a:hover,
+.header li a:active,
+.header li a:focus {
   color: #23527c;
+}
+.nav li.disabled a:hover {
+  border-color: transparent;
 }
 #logo {
   max-height: 40px;
