@@ -58,6 +58,8 @@ dependencies {
   compile("org.mindrot", "jbcrypt", "0.3m")
   compile("org.slf4j", "slf4j-simple", "1.7.25")
 
+  compile("org.webjars", "jquery", "1.11.1")
+  compile("org.webjars", "bootstrap", "3.4.1")
   compile("org.webjars.npm", "vue", "2.6.10")
 
   // App test dependencies

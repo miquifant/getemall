@@ -1,0 +1,57 @@
+/*!
+ * getemall.css
+ * (c) 2020 Miquifant
+ */
+* {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  position: relative;
+  min-height: 100%;
+}
+form {
+  margin: 0;
+  padding: 0;
+}
+#content {
+  padding: 25px;
+}
+.btn-dark {
+  background-color: #24292e !important;
+  border-color: #64696e !important;
+}
+.btn-dark:hover,
+.btn-dark:active,
+.btn-dark:visited,
+.btn-dark:focus {
+  background-color: #eee !important;
+  border-color: #ddd !important;
+}
+button.actn {
+  font-size: 12px;
+  text-align: center;
+  padding: 2px;
+  margin-right: 1px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+
+  /* changed in :hover, :disabled */
+  color: #46517d;
+  opacity: 0.9;
+  text-shadow: none;
+}
+button.actn:hover {
+  color: black;
+  opacity: 1;
+  text-shadow: 0px 0px 10px white;
+}
+button.actn.delete {
+  color: b00;
+}
+button.actn.delete:hover {
+  color: f00;
+}
