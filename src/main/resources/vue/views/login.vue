@@ -1,21 +1,59 @@
-<!-- Taken from David Asen's old tutorial: https://javalin.io/tutorials/website-example -->
 <template id="login">
   <app-frame>
-    <form id="loginForm" method="post">
-      <p v-if="loginState.authError" class="verybad notification">Can't log in at the moment. We are having problems.</p>
-      <p v-if="loginState.authFailed" class="bad notification">The login information you supplied was incorrect.</p>
-      <p v-if="loginState.authSucceeded" class="good notification">Authentication Succeeded.</p>
-      <p v-if="loginState.loggedOut" class="notification">You have been logged out.</p>
+
+    <div v-if="loginState.authError" class="alert alert-warning alert-dismissible fade in login-message" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <i class="glyphicon glyphicon-warning-sign"></i>
+      <span>
+        <strong>Oh no!</strong>
+        Can't log in at the moment. We're having problems.
+      </span>
+    </div>
+
+    <div v-if="loginState.authFailed" class="alert alert-danger alert-dismissible fade in login-message" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <i class="glyphicon glyphicon-exclamation-sign"></i>
+      <span>
+        <strong>Error!</strong>
+        The login information you supplied was incorrect.
+      </span>
+    </div>
+
+    <div v-if="loginState.authSucceeded" class="alert alert-success alert-dismissible fade in login-message" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <i class="glyphicon glyphicon-check"></i>
+      <span>
+        <strong>Hello!</strong>
+        Authentication Succeeded.
+      </span>
+    </div>
+
+    <div v-if="loginState.loggedOut" class="alert alert-info alert-dismissible fade in login-message" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <i class="glyphicon glyphicon-info-sign"></i>
+      <span>
+        <strong>Bye!</strong>
+        You have been logged out.
+      </span>
+    </div>
+
+    <div class="login">
       <h1>Login</h1>
-      <label>Username</label>
-      <input type="text" name="username" placeholder="username" value="" required>
-      <label>Password</label>
-      <input type="password" name="password" placeholder="password" value="" required>
-      <input v-if="loginState.redirect" type="hidden" name="redirect" :value="loginState.redirect">
-      <input type="submit" value="Log in">
-      <span v-if="currentUser">You're already logged in as <strong>{{ this.currentUser }}</strong></span>
-      <span v-if="loginState.redirect">You need to be logged in to see that page.</span>
-    </form>
+      <form id="loginForm" method="post">
+        <div class="form-group">
+          <label for="username">User name:</label>
+          <input type="username" class="form-control" id="username" name="username" placeholder="username" value="" required>
+        </div>
+        <div class="form-group">
+          <label for="pwd">Password:</label>
+          <input type="password" class="form-control" id="pwd" name="password" placeholder="password" value="" required>
+        </div>
+        <input v-if="loginState.redirect" type="hidden" name="redirect" :value="loginState.redirect">
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <span class="bottom-message" v-if="currentUser">You're already logged in as <strong>{{ this.currentUser }}</strong></span>
+      <span class="bottom-message" v-if="loginState.redirect">You need to be logged in to see that page.</span>
+    </div>
   </app-frame>
 </template>
 
@@ -40,42 +78,22 @@ Vue.component("login", {
 </script>
 
 <style>
-#loginForm {
+.login-message {
+  max-width: 500px;
+  margin: 0 auto 20px auto;
+}
+.login-message strong {
+ margin: 0 6px;
+}
+.login {
   max-width: 400px;
   margin: 0 auto;
+  border: dotted 1px silver;
+  border-radius: 6px;
+  padding: 0 20px 20px 20px;
 }
-#loginForm label {
+.bottom-message {
   display: block;
-  width: 100%
-}
-#loginForm input {
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  width: 100%;
-  border-radius: 3px;
-  margin: 2px 0 20px 0;
-}
-#loginForm input[type="submit"] {
-  color: white;
-  background: #274555;
-  border: 0;
-  cursor: pointer;
-}
-.notification {
-  padding: 10px;
-  background: #333;
-  color: white;
-  border-radius: 3px;
-}
-.good.notification {
-  background: #008900;
-}
-.bad.notification {
-  background: #bb0000;
-}
-.verybad.notification {
-  background: white;
-  color: red;
-  border: solid 3px red;
+  margin-top: 30px;
 }
 </style>
