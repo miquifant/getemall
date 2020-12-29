@@ -6,12 +6,12 @@
 </template>
 
 <script>
-  Vue.component("view-1", {
-    template: "#view-1",
-    mounted: function() {
-      $("#v1-tab").tab("show")
-    }
-  });
+Vue.component("view-1", {
+  template: "#view-1",
+  mounted: function() {
+    $("#v1-tab").tab("show")
+  }
+});
 </script>
 
 <style>
