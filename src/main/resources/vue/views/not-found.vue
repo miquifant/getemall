@@ -1,6 +1,6 @@
 <template id="not-found">
   <app-frame>
-    <h1>We can't find the page you're looking for<h1>
+    <h1>We can't find the page you're looking for</h1>
     <h2><small>(error 404)</small></h2>
   </app-frame>
 </template>

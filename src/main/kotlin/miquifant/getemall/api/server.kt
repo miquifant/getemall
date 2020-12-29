@@ -9,7 +9,9 @@ package miquifant.getemall.api
 import miquifant.getemall.api.authentication.impl.UserDatabaseDao
 import miquifant.getemall.api.controller.Admin
 import miquifant.getemall.api.controller.LoginController
+import miquifant.getemall.api.controller.Profiles
 import miquifant.getemall.api.controller.ServiceController
+import miquifant.getemall.api.controller.ProfilesController
 import miquifant.getemall.api.controller.Web
 import miquifant.getemall.command.Opts
 import miquifant.getemall.command.loadFullConfig
@@ -81,6 +83,11 @@ fun startServer(opts: Opts): Javalin {
     get  (Admin.Uri.READINESS,   ServiceController.readiness(userDao, db), GrantedFor.anyone)
     get  (Admin.Uri.METADATA,    ServiceController.metadata,   GrantedFor.anyone)
     post (Admin.Uri.KILL,        ServiceController.kill(this), GrantedFor.admins)
+
+    // Profiles cRud
+    get (Profiles.Uri.PROFILES, ProfilesController.getAll(db), GrantedFor.admins)
+    get (Profiles.Uri.ONE_PROFILE, ProfilesController.getOne(db), GrantedFor.anyone)
+    get (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.getByName(db), GrantedFor.anyone)
 
     /* =========================================================================================
      *  Web
