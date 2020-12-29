@@ -5,6 +5,8 @@
  */
 package miquifant.getemall.utils
 
+import miquifant.getemall.model.ExceptionalResponse
+import miquifant.getemall.model.ExceptionalResponse.Companion.unknownError
 import miquifant.getemall.utils.AppRole.*
 
 import io.javalin.core.security.Role
@@ -26,4 +28,12 @@ internal object GrantedFor {
   val admins        = setOf(ADMIN)
   val loggedInUsers = admins + setOf(REGULAR_USER)
   val anyone        = loggedInUsers + setOf(ANONYMOUS)
+}
+
+fun Context.exception(code: Int, message: String): Context {
+  return this.exception(ExceptionalResponse(code, message))
+}
+
+fun Context.exception(res: ExceptionalResponse = unknownError): Context {
+  return this.status(res.code).json(res)
 }

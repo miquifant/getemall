@@ -10,6 +10,7 @@ import miquifant.getemall.model.ExceptionalResponse.Companion.inserted
 import miquifant.getemall.model.ExceptionalResponse.Companion.notFound
 import miquifant.getemall.model.ExceptionalResponse.Companion.ok
 import miquifant.getemall.model.ExceptionalResponse.Companion.unauthorized
+import miquifant.getemall.model.ExceptionalResponse.Companion.unknownError
 import miquifant.getemall.persistence.SQLReturnCode
 
 import kotlin.test.Test
@@ -17,6 +18,12 @@ import kotlin.test.assertEquals
 
 
 class TestApiEntities {
+
+  @Test
+  fun testUnknownError() {
+    assertEquals(500, unknownError.code)
+    assertEquals("Unknown error", unknownError.message)
+  }
 
   @Test
   fun testBadRequest() {
