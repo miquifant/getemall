@@ -14,6 +14,8 @@ data class ExceptionalResponse(val code: Int, val message: String) {
 
   companion object {
 
+    val unknownError = ExceptionalResponse(500, "Unknown error")
+
     val badRequest   = ExceptionalResponse(400, "Bad request")
     val unauthorized = ExceptionalResponse(401, "Unauthorized")
     val notFound     = ExceptionalResponse(404, "Not found")

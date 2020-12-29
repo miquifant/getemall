@@ -91,7 +91,7 @@ object ServiceController {
           "Access denied to '${ctx.matchedPath()}' for user '${user?.name ?: "anonymous"}' with role '$role'"
         }
         // Capture it with a Content-Type:"html" specific 401 error filter, to redirect to login or unauthorized page
-        ctx.status(401).json(ExceptionalResponse.unauthorized)
+        ctx.exception(ExceptionalResponse.unauthorized)
       }
     }
   }
@@ -118,6 +118,7 @@ object ServiceController {
 
   val exceptionHandler: ExceptionHandler = { e, ctx ->
     logger.errorWithThrowable(e) { "An error occurred: ${e.message}" }
+    // TODO As the application becomes more "production ready" this response should disappear
     ctx.status(500).json(e)
   }
 
