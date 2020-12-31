@@ -42,3 +42,29 @@ const handleFetch = (endpoint, query, handler, errHandler) => {
         else alert(e.message);
     })
 };
+const handleSave = (endpoint, obj, handler, errHandler) => {
+  return fetch("/api/" + endpoint, {
+      method: (obj.id && obj.id !== 0)? "put": "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(obj)
+  }).then(res => res.json())
+    .then(getResponseOrBreak)
+    .then(handler)
+    .catch((e) => {
+        console.log("Error saving " + endpoint + ": " + e);
+        if (errHandler) errHandler(e);
+        else alert(e.message);
+    })
+};
+const handleDelete = (endpoint, id, handler, errHandler) => {
+  return fetch("/api/" + endpoint + "/" + id, {
+      method: "delete"
+  }).then(res => res.json())
+    .then(getResponseOrBreak)
+    .then(handler)
+    .catch((e) => {
+        console.log("Error deleting " + endpoint + ": " + e);
+        if (errHandler) errHandler(e);
+        else alert(e.message);
+    })
+};
