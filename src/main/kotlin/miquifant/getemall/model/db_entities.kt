@@ -23,3 +23,7 @@ data class Profile(val id: Int,
                    val verified: Boolean,
                    val active: Boolean,
                    val ext: ProfileExt = ProfileExt())
+
+data class Organization(val id: Int,
+                        val name: String,
+                        val owner: Int)

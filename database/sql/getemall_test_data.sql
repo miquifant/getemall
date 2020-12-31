@@ -15,3 +15,10 @@ INSERT INTO users (email, salt, password, nickname, verified, role) VALUES
 insert into profiles (id, profile_pic, full_name, pub_email, bio) VALUES
  (2, null, 'Miquifant', 'miqui@personal.fake', 'I''ll tell you something about me. The thing is that I am miqui. That''s all I want to say about this particular topic')
 ;
+
+DELETE FROM organizations
+;
+INSERT INTO organizations (name, owner) VALUES
+ ('Miqui Family', 2),
+ ('Fake Company', 3)
+;

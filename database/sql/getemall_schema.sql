@@ -76,3 +76,18 @@ INSERT INTO profiles (id, full_name) VALUES
 -- ============================================================================================= --
 -- USER TABLES: Managed by getemall users
 -- ============================================================================================= --
+
+CREATE TABLE IF NOT EXISTS organizations (
+  `id`        int          NOT NULL AUTO_INCREMENT   COMMENT 'Organization id',
+  `name`      varchar(128) NOT NULL                  COMMENT 'Name of the organization',
+  `owner`     int          NOT NULL                  COMMENT 'User id of the organization owner',
+  CONSTRAINT organizations_PK PRIMARY KEY (id),
+  CONSTRAINT organization_name_UN UNIQUE KEY (name),
+  CONSTRAINT organization_users_FK FOREIGN KEY (owner)
+    REFERENCES users(id)
+    ON UPDATE CASCADE
+)
+CHARACTER SET utf8 COLLATE utf8_spanish_ci
+ENGINE=InnoDB
+COMMENT='Organizations or groups of users who want to play together'
+;
