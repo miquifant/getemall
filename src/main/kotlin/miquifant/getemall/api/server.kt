@@ -7,12 +7,7 @@
 package miquifant.getemall.api
 
 import miquifant.getemall.api.authentication.impl.UserDatabaseDao
-import miquifant.getemall.api.controller.Admin
-import miquifant.getemall.api.controller.LoginController
-import miquifant.getemall.api.controller.Profiles
-import miquifant.getemall.api.controller.ServiceController
-import miquifant.getemall.api.controller.ProfilesController
-import miquifant.getemall.api.controller.Web
+import miquifant.getemall.api.controller.*
 import miquifant.getemall.command.Opts
 import miquifant.getemall.command.loadFullConfig
 import miquifant.getemall.log.LoggerFactory
@@ -88,6 +83,13 @@ fun startServer(opts: Opts): Javalin {
     get (Profiles.Uri.PROFILES, ProfilesController.getAll(db), GrantedFor.admins)
     get (Profiles.Uri.ONE_PROFILE, ProfilesController.getOne(db), GrantedFor.anyone)
     get (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.getByName(db), GrantedFor.anyone)
+
+    // Organizations CRUD
+    post   (Organizations.Uri.ORGANIZATIONS,    OrganizationsController.create(db), GrantedFor.admins)
+    get    (Organizations.Uri.ORGANIZATIONS,    OrganizationsController.getAll(db), GrantedFor.admins)
+    get    (Organizations.Uri.ONE_ORGANIZATION, OrganizationsController.getOne(db), GrantedFor.admins)
+    put    (Organizations.Uri.ORGANIZATIONS,    OrganizationsController.update(db), GrantedFor.admins)
+    delete (Organizations.Uri.ONE_ORGANIZATION, OrganizationsController.delete(db), GrantedFor.admins)
 
     /* =========================================================================================
      *  Web
