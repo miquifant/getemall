@@ -41,7 +41,9 @@ class TestPersistenceProfiles {
     assertEquals(4, profiles.size)
 
     val connection = db()
-    connection.createStatement().execute("TRUNCATE TABLE users")
+    // Since there is a constraint in organizations table, we have to empty that table first
+    connection.createStatement().execute("TRUNCATE TABLE organizations")
+    connection.createStatement().execute("DELETE FROM users")
     val (retEmpty, noProfiles) = retrieveProfilesList(db, logger)
     assertEquals(SQLReturnCode.Succeeded, retEmpty)
     assertEquals(0, noProfiles.size)

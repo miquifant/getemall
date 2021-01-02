@@ -17,3 +17,7 @@ data class Profile(val id: Int,
                    val timestamp: Timestamp,
                    val verified: Boolean,
                    val active: Boolean)
+
+data class Organization(val id: Int,
+                        val name: String,
+                        val owner: Int)

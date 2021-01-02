@@ -8,10 +8,23 @@ package miquifant.getemall.persistence
 
 import miquifant.getemall.log.Loggable
 import miquifant.getemall.model.Profile
+import miquifant.getemall.persistence.SQLReturnCode.Constraint
 import miquifant.getemall.utils.ConnectionManager
 
 
 private object SQLprofile {
+
+  /**
+   * These constraints aren't currently being used (since this Data Access module is for readonly operations) but,
+   * having created the organizations table with a FK referencing this table, we prefer to declare constraints now.
+   * Please remove this comment and warning supression if any 'create', 'update' or 'delete' operation is implemented.
+   */
+  @Suppress("unused")
+  val constraints: List<Constraint> = listOf(
+      Constraint(Regex("(?i).*user_email_UN.*"), SQLReturnCode.UniqueError("Email already exists")),
+      Constraint(Regex("(?i).*user_superpowers_FK.*"), SQLReturnCode.FKError("Invalid role")),
+      Constraint(Regex("(?i).*organization_users_FK*"), SQLReturnCode.FKError("User is owner of some organization"))
+  )
 
   val list = """
     |SELECT id, email, nickname, fullname, role, timestamp, verified, active
