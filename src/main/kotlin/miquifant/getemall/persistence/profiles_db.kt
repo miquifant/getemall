@@ -22,7 +22,8 @@ private object SQLprofile {
       Constraint(Regex("(?i).*user_name_UN.*"), SQLReturnCode.UniqueError("Username already taken")),
       Constraint(Regex("(?i).*user_superpowers_FK.*"), SQLReturnCode.FKError("Invalid role")),
       Constraint(Regex("(?i).*profile_user_FK.*"), SQLReturnCode.FKError("Invalid user")),
-      Constraint(Regex(".*PRIMARY.*"), SQLReturnCode.PKError("Profile already exists"))
+      Constraint(Regex(".*PRIMARY.*"), SQLReturnCode.PKError("Profile already exists")),
+      Constraint(Regex("(?i).*organization_users_FK*"), SQLReturnCode.FKError("User is owner of some organization"))
   )
 
   val list = """
