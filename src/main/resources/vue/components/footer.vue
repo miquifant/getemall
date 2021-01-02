@@ -12,10 +12,10 @@
             <h4 class="modal-title" id="metadataLabel">About Getemall</h4>
           </div>
           <div class="modal-body modal-body-metadata">
-            <h4>This version</h4>
-            <ul>
-              <li>version: {{ metadata.version }}</li>
-            </ul>
+            <div class="metadata">
+              Getemall version {{ metadata.version }} ({{ metadata.date }})<br>
+              Compiled by {{ metadata.user }}@{{ metadata.machine }}
+            </div>
             <h4>Getemall uses</h4>
             <ul>
               <li><a href="https://gradle.org/" target="_blank">Gradle 5.6.4</a></li>
@@ -71,5 +71,16 @@ Vue.component("page-footer", {
 .modal-body-metadata {
   line-height: 24px;
   text-align: left;
+}
+.metadata {
+  font: monospace;
+  font-size: .8em;
+  line-height: 1.2em;
+  border-top: solid 1px #ece9e0;
+  border-bottom: solid 1px #ece9e0;
+  padding: 6px;
+  margin: 0 0 24px 0;
+  background: #fcf9f3;
+  color: #555;
 }
 </style>
