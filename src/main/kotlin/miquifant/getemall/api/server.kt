@@ -109,6 +109,7 @@ fun startServer(opts: Opts): Javalin {
 
     get  (Web.Uri.SETTINGS_PROFILE,  VueComponent("settings-profile"),  GrantedFor.loggedInUsers)
     get  (Web.Uri.SETTINGS_ACCOUNT,  VueComponent("settings-account"),  GrantedFor.loggedInUsers)
+    get  (Web.Uri.SETTINGS_PASSWORD, VueComponent("settings-password"), GrantedFor.loggedInUsers)
 
     get  (Web.Uri.PROFILES, VueComponent("profile"), GrantedFor.anyone)
 

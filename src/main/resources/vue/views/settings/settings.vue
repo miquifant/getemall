@@ -21,6 +21,7 @@
           </div>
           <a id="menu-settings-profile" class="menu-item" href="/settings/profile">Profile</a>
           <a id="menu-settings-account" class="menu-item" href="/settings/account">Account</a>
+          <a id="menu-settings-password" class="menu-item" href="/settings/password">Account password</a>
         </nav>
       </div>
       <div class="col-sm-9">

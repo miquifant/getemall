@@ -27,6 +27,19 @@
         </div>
       </div>
       <button type="submit" class="btn btn-default" :disabled="!validUsername">Change username</button>
+      <p class="settings-comment settings-comment-small">
+        <i class="glyphicon glyphicon-question-sign"></i>
+        <span>Looking to manage account security settings? You can find them in the <a href="/settings/password">Account password</a> tab.</span>
+      </p>
+    </form>
+    <h2 class="settings-title settings-title-danger subhead-spacious">Delete account</h2>
+    <form v-if="profile" id="settingsDeleteAccountForm" method="post">
+      <div class="row">
+        <div class="col-sm-12 settings-comment">
+          Once you delete your account, there is no going back. Please be certain.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-danger" disabled>Delete your account</button>
     </form>
   </settings>
 </template>

@@ -21,6 +21,7 @@ object Web {
     const val INDEX  = "/index"
     const val SETTINGS_PROFILE = "/settings/profile"
     const val SETTINGS_ACCOUNT = "/settings/account"
+    const val SETTINGS_PASSWORD = "/settings/password"
     const val PROFILES = "/profiles/:name"
     const val VIEW1  = "/v1"
     const val VIEW2  = "/v2"
