@@ -26,16 +26,15 @@ INSERT INTO superpowers (name) VALUES
 ;
 
 CREATE TABLE IF NOT EXISTS users (
-  `id`        int          NOT NULL AUTO_INCREMENT   COMMENT 'User id',
-  `email`     varchar(128) NOT NULL                  COMMENT 'User email address',
-  `nickname`  varchar(128) NOT NULL                  COMMENT 'User nick name',
-  `fullname`  varchar(128)          DEFAULT nickname COMMENT 'User full name',
-  `salt`      varchar(128) NOT NULL                  COMMENT 'Hashing salt',
-  `password`  varchar(128) NOT NULL                  COMMENT 'Hashed password',
-  `role`      int                                    COMMENT 'Special role of the user. `null` means regular user',
-  `timestamp` timestamp    NOT NULL DEFAULT NOW()    COMMENT 'User creation timestamp',
-  `verified`  boolean      NOT NULL DEFAULT false    COMMENT 'Email has been verified by system',
-  `active`    boolean      NOT NULL DEFAULT true     COMMENT 'User is active',
+  `id`        int          NOT NULL AUTO_INCREMENT COMMENT 'User id',
+  `email`     varchar(128) NOT NULL                COMMENT 'User email address',
+  `nickname`  varchar(128) NOT NULL                COMMENT 'User nick name',
+  `salt`      varchar(128) NOT NULL                COMMENT 'Hashing salt',
+  `password`  varchar(128) NOT NULL                COMMENT 'Hashed password',
+  `role`      int                                  COMMENT 'Special role of the user. `null` means regular user',
+  `timestamp` timestamp    NOT NULL DEFAULT NOW()  COMMENT 'User creation timestamp',
+  `verified`  boolean      NOT NULL DEFAULT false  COMMENT 'Email has been verified by system',
+  `active`    boolean      NOT NULL DEFAULT true   COMMENT 'User is active',
   CONSTRAINT user_PK PRIMARY KEY (id),
   CONSTRAINT user_email_UN UNIQUE KEY (email),
   CONSTRAINT user_superpowers_FK FOREIGN KEY (role)
@@ -51,6 +50,26 @@ INSERT INTO users (email, salt, password, nickname, role) VALUES
  ('admin@localhost', '$2a$10$IrbIJHf9x/ZvKlVtG4azTO', '$2a$10$IrbIJHf9x/ZvKlVtG4azTOfX2i7uu13wIHuOyh4R6xAZ2jYuqP2he', 'admin', 1)
 ;
 
+CREATE TABLE IF NOT EXISTS profiles (
+  `id`          int          NOT NULL               COMMENT 'User id',
+  `profile_pic` varchar(128)                        COMMENT 'User profile picture name',
+  `full_name`   varchar(128)                        COMMENT 'User full name',
+  `pub_email`   varchar(128)                        COMMENT 'Public email',
+  `bio`         text                                COMMENT 'User bio',
+  `timestamp`   timestamp    NOT NULL DEFAULT NOW() COMMENT 'Last update timestamp',
+  CONSTRAINT profile_PK PRIMARY KEY (id),
+  CONSTRAINT profile_user_FK FOREIGN KEY (id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+CHARACTER SET utf8 COLLATE utf8_spanish_ci
+ENGINE=InnoDB
+COMMENT='Optional attributes of user to complete public profile'
+;
+INSERT INTO profiles (id, full_name) VALUES
+ (1, 'Platform administrator')
+;
 
 -- ============================================================================================= --
 -- USER TABLES: Managed by getemall users
