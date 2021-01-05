@@ -1,5 +1,6 @@
 <template id="view-3">
   <app-frame>
+    <profile-loader :parent="this"></profile-loader>
     <h1 class="title-view-3">This is the third view</h1>
     <h2>Only for admins</h2>
     <h3>Organizations</h3>
@@ -9,7 +10,7 @@
       <div class="btngroup col-xs-8">
         <button class="btn btn-success btn-sm"
                 @click="createOrg"
-                :disabled="userid === 0"
+                :disabled="!profile"
                 title="Create a new organization"><i
                 class="glyphicon glyphicon-plus"></i>
                 <span>New</span>
@@ -85,7 +86,7 @@
 Vue.component("view-3", {
   template: "#view-3",
   data: () => ({
-    userid: 0,
+    profile: null,
     organizations: [],
     checkedOrgs: [],
     editedOrg: null,
@@ -97,7 +98,7 @@ Vue.component("view-3", {
       return null;
     },
     createOrg: function() {
-      this.editedOrg = { id: 0, name: "", owner: this.userid }
+      this.editedOrg = { id: 0, name: "", owner: this.profile.id }
       $("#editOrg").modal({ backdrop: "static" });
     },
     deleteOrgs: function() {
@@ -122,13 +123,6 @@ Vue.component("view-3", {
     // --------------------------------------------------------------------------------------------
     refreshOrgs: function() {
       handleFetchList("organizations", list => this.organizations = list);
-    },
-    setProfileId: function() {
-      // Set Getemall profile from logged-in user
-      handleFetch("profiles",
-        "name/" + this.$javalin.state.currentUser,
-        profile => this.userid = profile.id,
-        e => this.userid = 0);
     },
     doDeleteMultipleOrgs: function() {
       this.checkedOrgs.forEach(id => {
@@ -173,7 +167,6 @@ Vue.component("view-3", {
     $(this.$refs.editOrg).on("hidden.bs.modal", this.stopEditingOrg);
 
     this.refreshOrgs();
-    this.setProfileId();
   }
 });
 </script>
