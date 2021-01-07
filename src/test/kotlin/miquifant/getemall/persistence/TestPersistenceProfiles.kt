@@ -114,4 +114,32 @@ class TestPersistenceProfiles {
     assertEquals("Unable to recover profile '$existingProfileName' due an internal error", retKO.message)
     assertTrue(emptyList.isEmpty(), "Query should return no results")
   }
+
+  @Test
+  fun testCheckUsernameAvailability() {
+    assertNotNull(db(), "Unable to execute test due an error with database connection")
+
+    val availableUsername = "unexisting"
+    val takenUsername = "miqui"
+
+    val (ret1, availableWithUnexistingUsername) = checkUsernameAvailability(availableUsername, db, logger)
+    assertEquals(SQLReturnCode.Succeeded, ret1)
+    assertTrue(availableWithUnexistingUsername, "Username should be available")
+
+    val (ret2, availableWithExistingUsername) = checkUsernameAvailability(takenUsername, db, logger)
+    assertEquals(SQLReturnCode.Succeeded, ret2)
+    assertFalse(availableWithExistingUsername, "Username shouldn't be available")
+
+    // -----------
+    // TEST ERRORS
+    // -----------
+
+    // Will fail due technical error (like connection error)
+    db().close()
+
+    val (retKO, alwaysFalse) = checkUsernameAvailability(availableUsername, db, logger)
+    assertTrue(retKO is SQLReturnCode.DBError, "Return should be DBError")
+    assertEquals("Unable to check Username availability due an internal error", retKO.message)
+    assertFalse(alwaysFalse, "It should return username is not available")
+  }
 }
