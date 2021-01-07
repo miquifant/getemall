@@ -104,6 +104,8 @@ fun startServer(opts: Opts): Javalin {
     post (Web.Uri.LOGIN,  LoginController.handleLoginPost(userDao, accessLogger), GrantedFor.anyone)
     post (Web.Uri.LOGOUT, LoginController.handleLogoutPost,                       GrantedFor.anyone)
 
+    get  (Web.Uri.PROFILES, VueComponent("profile"), GrantedFor.anyone)
+
     get  (Web.Uri.VIEW1, VueComponent("view-1"), GrantedFor.anyone)
     get  (Web.Uri.VIEW2, VueComponent("view-2"), GrantedFor.loggedInUsers)
     get  (Web.Uri.VIEW3, VueComponent("view-3"), GrantedFor.admins)
