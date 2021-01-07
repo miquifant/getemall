@@ -19,6 +19,7 @@ object Web {
     const val LOGIN  = "/login"
     const val LOGOUT = "/logout"
     const val INDEX  = "/index"
+    const val PROFILES = "/profiles/:name"
     const val VIEW1  = "/v1"
     const val VIEW2  = "/v2"
     const val VIEW3  = "/v3"
