@@ -85,10 +85,11 @@ fun startServer(opts: Opts): Javalin {
     post (Admin.Uri.KILL,        ServiceController.kill(this), GrantedFor.admins)
 
     // Profiles cRud
-    get (Profiles.Uri.PROFILES,        ProfilesController.getAll(db),           GrantedFor.admins)
-    get (Profiles.Uri.OWN_PROFILE,     ProfilesController.getOwn(db),           GrantedFor.loggedInUsers)
-    get (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.getPublicProfile(db), GrantedFor.anyone)
-    get (Profiles.Uri.ONE_PROFILE,     ProfilesController.getOne(db),           GrantedFor.admins)
+    get  (Profiles.Uri.PROFILES,        ProfilesController.getAll(db),           GrantedFor.admins)
+    get  (Profiles.Uri.OWN_PROFILE,     ProfilesController.getOwn(db),           GrantedFor.loggedInUsers)
+    head (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.checkUsername(db),    GrantedFor.anyone)
+    get  (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.getPublicProfile(db), GrantedFor.anyone)
+    get  (Profiles.Uri.ONE_PROFILE,     ProfilesController.getOne(db),           GrantedFor.admins)
 
     /* =========================================================================================
      *  Web

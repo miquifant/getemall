@@ -63,6 +63,24 @@ object ProfilesController {
     }
   }
 
+  val checkUsername: (ConnectionManager) -> Handler = { db ->
+    { ctx ->
+      val name = ctx.pathParam<String>("name").get()
+      val (ret, available) = checkUsernameAvailability(name, db, logger)
+      when {
+
+        // 404 Not found (username is available)
+        ret == SQLReturnCode.Succeeded && available -> ctx.status(404)
+
+        // 200 (username is not available)
+        ret == SQLReturnCode.Succeeded -> ctx.status(200)
+
+        // 503 Service Unavailable: If a technical error occurred "Service unavailable"
+        else -> ctx.status(503)
+      }
+    }
+  }
+
   val getPublicProfile: (ConnectionManager) -> Handler = { db ->
     { ctx ->
       val name = ctx.pathParam<String>("name").get()

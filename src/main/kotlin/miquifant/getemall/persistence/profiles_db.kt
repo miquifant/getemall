@@ -6,7 +6,7 @@
  */
 package miquifant.getemall.persistence
 
-import miquifant.getemall.log.Loggable
+import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.model.Profile
 import miquifant.getemall.model.ProfileExt
 import miquifant.getemall.utils.ConnectionManager
@@ -38,9 +38,15 @@ private object SQLprofile {
     |WHERE u.nickname = ?
     |  AND active = true
   """.trimMargin().trim()
+
+  val checkUsername = """
+    |SELECT nickname
+    |FROM users
+    |WHERE nickname = ?
+  """.trimMargin().trim()
 }
 
-fun retrieveProfilesList(db: ConnectionManager, logger: Loggable.Logger):
+fun retrieveProfilesList(db: ConnectionManager, logger: Logger):
     Pair<SQLReturnCode, List<Profile>>
 {
   val ret = mutableListOf<Profile>()
@@ -69,7 +75,7 @@ fun retrieveProfilesList(db: ConnectionManager, logger: Loggable.Logger):
   }
 }
 
-fun retrieveProfile(id: Int, db: ConnectionManager, logger: Loggable.Logger):
+fun retrieveProfile(id: Int, db: ConnectionManager, logger: Logger):
     Pair<SQLReturnCode, List<Profile>>
 {
   val ret = mutableListOf<Profile>()
@@ -105,7 +111,7 @@ fun retrieveProfile(id: Int, db: ConnectionManager, logger: Loggable.Logger):
   }
 }
 
-fun retrieveProfile(name: String, db: ConnectionManager, logger: Loggable.Logger):
+fun retrieveProfile(name: String, db: ConnectionManager, logger: Logger):
     Pair<SQLReturnCode, List<Profile>>
 {
   val ret = mutableListOf<Profile>()
@@ -140,3 +146,19 @@ fun retrieveProfile(name: String, db: ConnectionManager, logger: Loggable.Logger
     Pair(SQLReturnCode.DBError(message), ret)
   }
 }
+
+fun checkUsernameAvailability(username: String, db:ConnectionManager, logger: Logger): Pair<SQLReturnCode, Boolean> =
+    try {
+      val stmt = db().prepareStatement(SQLprofile.checkUsername).apply {
+        setString(1, username)
+      }
+      val ret = !stmt.executeQuery().next()
+      stmt.closeOnCompletion()
+      Pair(SQLReturnCode.Succeeded, ret)
+    }
+    // Technical (like connection error)
+    catch (e: Exception) {
+      val message = "Unable to check Username availability due an internal error"
+      logger.errorWithThrowable(e) { "$message: ${e.message}" }
+      Pair(SQLReturnCode.DBError(message), false)
+    }
