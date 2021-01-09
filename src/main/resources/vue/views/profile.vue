@@ -32,7 +32,7 @@
 
         <!-- Button -->
         <div v-if="itsMe">
-          <a class="btn btn-default btn-edit-profile" href="/settings/profile" disabled>Edit profile</a>
+          <a class="btn btn-default btn-edit-profile" href="/settings/profile">Edit profile</a>
         </div>
         <div v-else class="row">
           <div class="col-sm-9 col-follow">

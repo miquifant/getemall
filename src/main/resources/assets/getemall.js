@@ -29,17 +29,33 @@ const handleFetch = (endpoint, query, handler, errHandler) => {
   return fetch("/api/" + endpoint + "/" + query, {
       method: "get"
   }).then(res => {
-        // when res.status is 404 server doesn't send any json, so we create it
-        if (res.status == 404)
-          return JSON.parse('{"code":"'+res.status+'","message":"Not found"}')
-        else return res.json()
-    })
-    .then(getResponseOrBreak)
+      // when res.status is 404 server doesn't send any json, so we create it
+      if (res.status == 404)
+        return JSON.parse('{"code":"'+res.status+'","message":"Not found"}')
+      else return res.json()
+  }).then(getResponseOrBreak)
     .then(handler)
     .catch((e) => {
         console.log("Error fetching " + endpoint + ": " + e);
         if (errHandler) errHandler(e);
         else alert(e.message);
+    })
+};
+const handleCheck = (endpoint, query, handler, errHandler) => {
+  return fetch("/api/" + endpoint + "/" + query, {
+      method: "head"
+  }).then(res => {
+      if (res.status == 404) return false;
+      else if (res.status == 200) return true;
+      else throw Error(res.status);
+    },
+    rej => {
+      throw Error("Rejected")
+    })
+    .then(handler)
+    .catch((e) => {
+        console.log("Error checking " + endpoint + ": " + e);
+        if (errHandler) errHandler(e);
     })
 };
 const handleSave = (endpoint, obj, handler, errHandler) => {
@@ -52,6 +68,24 @@ const handleSave = (endpoint, obj, handler, errHandler) => {
     .then(handler)
     .catch((e) => {
         console.log("Error saving " + endpoint + ": " + e);
+        if (errHandler) errHandler(e);
+        else alert(e.message);
+    })
+};
+// patch resource according to RFC-7386
+const handlePatch = (endpoint, query, patch, handler, errHandler) => {
+  return fetch("/api/" + endpoint + "/" + query, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/merge-patch+json" },
+      body: JSON.stringify(patch)
+  }).then(res => {
+      if (res.status == 204) return null;
+      else return res.json()
+  }).then(errJson => {
+      if (errJson) throw Error(errJson.message || errJson.title || "unknown error")
+  }).then(handler)
+    .catch((e) => {
+        console.log("Error patching " + endpoint + ": " + e);
         if (errHandler) errHandler(e);
         else alert(e.message);
     })
