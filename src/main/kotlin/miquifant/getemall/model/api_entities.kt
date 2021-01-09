@@ -10,18 +10,21 @@ import miquifant.getemall.persistence.SQLReturnCode
 import miquifant.getemall.persistence.SQLReturnCode.*
 
 
+typealias Patch = Map<String, Any?>
+
 data class ExceptionalResponse(val code: Int, val message: String) {
 
   companion object {
 
     val unknownError = ExceptionalResponse(500, "Unknown error")
 
-    val badRequest   = ExceptionalResponse(400, "Bad request")
+    val badRequest = ExceptionalResponse(400, "Bad request")
     val unauthorized = ExceptionalResponse(401, "Unauthorized")
-    val notFound     = ExceptionalResponse(404, "Not found")
+    val notFound = ExceptionalResponse(404, "Not found")
+    val unsupportedMediaType = ExceptionalResponse(415, "Unsupported media type")
 
-    val inserted     = ExceptionalResponse(201, "Inserted")
-    val ok           = ExceptionalResponse(200, "Ok")
+    val inserted = ExceptionalResponse(201, "Inserted")
+    val ok = ExceptionalResponse(200, "Ok")
 
     fun fromSQLReturnCode(sqlReturnCode: SQLReturnCode): ExceptionalResponse {
       return when (sqlReturnCode) {
