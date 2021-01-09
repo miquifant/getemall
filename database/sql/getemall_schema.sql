@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS users (
   `verified`  boolean      NOT NULL DEFAULT false  COMMENT 'Email has been verified by system',
   `active`    boolean      NOT NULL DEFAULT true   COMMENT 'User is active',
   CONSTRAINT user_PK PRIMARY KEY (id),
+  CONSTRAINT user_name_UN UNIQUE KEY (nickname),
   CONSTRAINT user_email_UN UNIQUE KEY (email),
   CONSTRAINT user_superpowers_FK FOREIGN KEY (role)
     REFERENCES superpowers(id)
