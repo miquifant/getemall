@@ -19,6 +19,7 @@ class TestPersistenceCommons {
     val deleted         = SQLReturnCode.Deleted
     val inserted        = SQLReturnCode.Inserted
     val updated         = SQLReturnCode.Updated
+    val patched         = SQLReturnCode.Patched
     val unaltered       = SQLReturnCode.Unaltered
     val notFound        = SQLReturnCode.NotFound
 
@@ -26,6 +27,7 @@ class TestPersistenceCommons {
     assertFalse(deleted.isError(),   "DELETED is not an error return code")
     assertFalse(inserted.isError(),  "INSERTED is not an error return code")
     assertFalse(updated.isError(),   "UPDATED is not an error return code")
+    assertFalse(patched.isError(),   "PATCHED is not an error return code")
     assertFalse(unaltered.isError(), "UNALTERED is not an error return code")
     assertFalse(notFound.isError(),  "NOT_FOUND is not an error return code")
   }

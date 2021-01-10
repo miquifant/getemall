@@ -11,6 +11,7 @@ import miquifant.getemall.model.ExceptionalResponse.Companion.notFound
 import miquifant.getemall.model.ExceptionalResponse.Companion.ok
 import miquifant.getemall.model.ExceptionalResponse.Companion.unauthorized
 import miquifant.getemall.model.ExceptionalResponse.Companion.unknownError
+import miquifant.getemall.model.ExceptionalResponse.Companion.unsupportedMediaType
 import miquifant.getemall.persistence.SQLReturnCode
 
 import kotlin.test.Test
@@ -41,6 +42,12 @@ class TestApiEntities {
   fun testNotFound() {
     assertEquals(404, notFound.code)
     assertEquals("Not found", notFound.message)
+  }
+
+  @Test
+  fun testUnsupportedMediaType() {
+    assertEquals(415, unsupportedMediaType.code)
+    assertEquals("Unsupported media type", unsupportedMediaType.message)
   }
 
   @Test

@@ -9,10 +9,19 @@ package miquifant.getemall.persistence
 import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.model.Profile
 import miquifant.getemall.model.ProfileExt
+import miquifant.getemall.persistence.SQLReturnCode.Constraint
 import miquifant.getemall.utils.ConnectionManager
+
+import java.sql.SQLIntegrityConstraintViolationException
 
 
 private object SQLprofile {
+
+  val constraints: List<Constraint> = listOf(
+      Constraint(Regex("(?i).*user_email_UN.*"), SQLReturnCode.UniqueError("Email already exists")),
+      Constraint(Regex("(?i).*user_name_UN.*"), SQLReturnCode.UniqueError("Username already taken")),
+      Constraint(Regex("(?i).*user_superpowers_FK.*"), SQLReturnCode.FKError("Invalid role"))
+  )
 
   val list = """
     |SELECT id, email, nickname, role, timestamp, verified, active
@@ -42,6 +51,12 @@ private object SQLprofile {
   val checkUsername = """
     |SELECT nickname
     |FROM users
+    |WHERE nickname = ?
+  """.trimMargin().trim()
+
+  val patchUsername = """
+    |UPDATE users
+    |SET nickname = ?
     |WHERE nickname = ?
   """.trimMargin().trim()
 }
@@ -161,4 +176,37 @@ fun checkUsernameAvailability(username: String, db:ConnectionManager, logger: Lo
       val message = "Unable to check Username availability due an internal error"
       logger.errorWithThrowable(e) { "$message: ${e.message}" }
       Pair(SQLReturnCode.DBError(message), false)
+    }
+
+fun patchProfileUsername(curName: String, newName: String, db: ConnectionManager, logger: Logger):
+    SQLReturnCode =
+    try {
+      val stmt = db().prepareStatement(SQLprofile.patchUsername).apply {
+        setString(1, newName)
+        setString(2, curName)
+      }
+      val rows = stmt.executeUpdate()
+      stmt.closeOnCompletion()
+      if (rows == 1)
+
+        SQLReturnCode.Patched
+
+      else {
+        logger.info { "Couldn't find profile to patch" }
+        SQLReturnCode.NotFound
+      }
+    }
+    // Functional (like name already taken)
+    catch (e: SQLIntegrityConstraintViolationException) {
+      val constraintError = SQLReturnCode.constraintErrorFromMessage(e.message, SQLprofile.constraints)
+      logger.error {
+        "Unable to patch profile '$curName' due an error: ${constraintError.message}"
+      }
+      constraintError
+    }
+    // Technical (like connection error)
+    catch (e: Exception) {
+      val message = "Unable to patch profile '$curName' due an internal error"
+      logger.errorWithThrowable(e) { "$message: ${e.message}" }
+      SQLReturnCode.DBError(message)
     }

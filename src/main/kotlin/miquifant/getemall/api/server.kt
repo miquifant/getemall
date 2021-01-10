@@ -85,11 +85,12 @@ fun startServer(opts: Opts): Javalin {
     post (Admin.Uri.KILL,        ServiceController.kill(this), GrantedFor.admins)
 
     // Profiles cRud
-    get  (Profiles.Uri.PROFILES,        ProfilesController.getAll(db),           GrantedFor.admins)
-    get  (Profiles.Uri.OWN_PROFILE,     ProfilesController.getOwn(db),           GrantedFor.loggedInUsers)
-    head (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.checkUsername(db),    GrantedFor.anyone)
-    get  (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.getPublicProfile(db), GrantedFor.anyone)
-    get  (Profiles.Uri.ONE_PROFILE,     ProfilesController.getOne(db),           GrantedFor.admins)
+    get   (Profiles.Uri.PROFILES,        ProfilesController.getAll(db),           GrantedFor.admins)
+    get   (Profiles.Uri.OWN_PROFILE,     ProfilesController.getOwn(db),           GrantedFor.loggedInUsers)
+    patch (Profiles.Uri.OWN_PROFILE,     ProfilesController.patchOwn(db),         GrantedFor.loggedInUsers)
+    head  (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.checkUsername(db),    GrantedFor.anyone)
+    get   (Profiles.Uri.PROFILE_BY_NAME, ProfilesController.getPublicProfile(db), GrantedFor.anyone)
+    get   (Profiles.Uri.ONE_PROFILE,     ProfilesController.getOne(db),           GrantedFor.admins)
 
     /* =========================================================================================
      *  Web
@@ -104,6 +105,10 @@ fun startServer(opts: Opts): Javalin {
     get  (Web.Uri.LOGIN,  VueComponent("login"),                                  GrantedFor.anyone)
     post (Web.Uri.LOGIN,  LoginController.handleLoginPost(userDao, accessLogger), GrantedFor.anyone)
     post (Web.Uri.LOGOUT, LoginController.handleLogoutPost,                       GrantedFor.anyone)
+
+    get  (Web.Uri.SETTINGS_ACCOUNT,  VueComponent("settings-account"),  GrantedFor.loggedInUsers)
+    // TODO /settings/profile --> redirects to --> /settings/account // until its implemented
+    get  (Web.Uri.SETTINGS_PROFILE,  VueComponent("settings-account"),  GrantedFor.loggedInUsers)
 
     get  (Web.Uri.PROFILES, VueComponent("profile"), GrantedFor.anyone)
 

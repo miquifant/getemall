@@ -17,6 +17,7 @@ sealed class SQLReturnCode (private val code: Code) {
     DELETED,
     INSERTED,
     UPDATED,
+    PATCHED,
     UNALTERED,
     NOT_FOUND,
     ERROR,            // Unknown error
@@ -29,6 +30,7 @@ sealed class SQLReturnCode (private val code: Code) {
   object Deleted:   SQLReturnCode (DELETED)
   object Inserted:  SQLReturnCode (INSERTED)
   object Updated:   SQLReturnCode (UPDATED)
+  object Patched:   SQLReturnCode (PATCHED)
   object Unaltered: SQLReturnCode (UNALTERED)
   object NotFound:  SQLReturnCode (NOT_FOUND)
 
