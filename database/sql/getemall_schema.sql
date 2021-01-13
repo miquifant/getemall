@@ -56,7 +56,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   `profile_pic` varchar(128)                        COMMENT 'User profile picture name',
   `full_name`   varchar(128)                        COMMENT 'User full name',
   `pub_email`   varchar(128)                        COMMENT 'Public email',
-  `bio`         text                                COMMENT 'User bio',
+  `pub_email_v` boolean      NOT NULL DEFAULT false COMMENT 'Public email is verified',
+  `bio`         varchar(256)                        COMMENT 'User bio',
   `timestamp`   timestamp    NOT NULL DEFAULT NOW() COMMENT 'Last update timestamp',
   CONSTRAINT profile_PK PRIMARY KEY (id),
   CONSTRAINT profile_user_FK FOREIGN KEY (id)

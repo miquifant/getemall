@@ -20,7 +20,9 @@ private object SQLprofile {
   val constraints: List<Constraint> = listOf(
       Constraint(Regex("(?i).*user_email_UN.*"), SQLReturnCode.UniqueError("Email already exists")),
       Constraint(Regex("(?i).*user_name_UN.*"), SQLReturnCode.UniqueError("Username already taken")),
-      Constraint(Regex("(?i).*user_superpowers_FK.*"), SQLReturnCode.FKError("Invalid role"))
+      Constraint(Regex("(?i).*user_superpowers_FK.*"), SQLReturnCode.FKError("Invalid role")),
+      Constraint(Regex("(?i).*profile_PK.*"), SQLReturnCode.FKError("Id already taken")),
+      Constraint(Regex("(?i).*profile_user_FK.*"), SQLReturnCode.FKError("Invalid user"))
   )
 
   val list = """
@@ -31,7 +33,7 @@ private object SQLprofile {
 
   val show = """
     |SELECT u.id, u.email, u.nickname, u.role, u.timestamp, u.verified, u.active,
-    |       p.profile_pic, p.full_name, p.pub_email, p.bio
+    |       p.profile_pic, p.full_name, p.pub_email, p.pub_email_v, p.bio
     |FROM users u
     |  LEFT OUTER JOIN profiles p
     |    ON p.id = u.id
@@ -40,7 +42,7 @@ private object SQLprofile {
 
   val showByName = """
     |SELECT u.id, u.email, u.nickname, u.role, u.timestamp, u.verified, u.active,
-    |       p.profile_pic, p.full_name, p.pub_email, p.bio
+    |       p.profile_pic, p.full_name, p.pub_email, p.pub_email_v, p.bio
     |FROM users u
     |  LEFT OUTER JOIN profiles p
     |    ON p.id = u.id
@@ -112,7 +114,8 @@ fun retrieveProfile(id: Int, db: ConnectionManager, logger: Logger):
               profilePic = rs.getObject(8)?.toString(),
               fullName = rs.getObject(9)?.toString(),
               pubEmail = rs.getObject(10)?.toString(),
-              bio = rs.getObject(11)?.toString()
+              pubEmailVerified = rs.getBoolean(11),
+              bio = rs.getObject(12)?.toString()
           )
       ))
     stmt.closeOnCompletion()
@@ -148,7 +151,8 @@ fun retrieveProfile(name: String, db: ConnectionManager, logger: Logger):
               profilePic = rs.getObject(8)?.toString(),
               fullName = rs.getObject(9)?.toString(),
               pubEmail = rs.getObject(10)?.toString(),
-              bio = rs.getObject(11)?.toString()
+              pubEmailVerified = rs.getBoolean(11),
+              bio = rs.getObject(12)?.toString()
           )
       ))
     stmt.closeOnCompletion()

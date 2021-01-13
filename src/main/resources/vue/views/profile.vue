@@ -52,6 +52,8 @@
           <li v-if="profile.ext.pubEmail" class="vcard-detail">
             <i class="glyphicon glyphicon-envelope"></i>
             <a :href="'mailto:' + profile.ext.pubEmail">{{ profile.ext.pubEmail }}</a>
+            <i v-if="profile.ext.pubEmailVerified" class="glyphicon glyphicon-ok-sign green" title="verified"></i>
+            <i v-else class="glyphicon glyphicon-remove-sign red" title="unverified"></i>
           </li>
           <li v-if="profile.ext.websiteUrl" class="vcard-detail">
             <i class="glyphicon glyphicon-link"></i>
