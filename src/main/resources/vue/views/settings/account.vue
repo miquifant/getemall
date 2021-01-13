@@ -150,10 +150,12 @@ Vue.component("settings-account", {
 .form-control-feedback {
   display: none;
 }
-#feedback-username.glyphicon-ok {
+#feedback-username.glyphicon-ok,
+.glyphicon.green {
   color: #5ab034;
 }
-#feedback-username.glyphicon-warning-sign {
+#feedback-username.glyphicon-warning-sign,
+.glyphicon.red {
   color: #bf1515;
 }
 .loader {

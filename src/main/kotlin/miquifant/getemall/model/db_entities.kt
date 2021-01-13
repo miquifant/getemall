@@ -12,6 +12,7 @@ import java.sql.Timestamp
 data class ProfileExt(val profilePic: String? = null,
                       val fullName: String? = null,
                       val pubEmail: String? = null,
+                      val pubEmailVerified: Boolean = false,
                       val bio: String? = null)
 
 data class Profile(val id: Int,
