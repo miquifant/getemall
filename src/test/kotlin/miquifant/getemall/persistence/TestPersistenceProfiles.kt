@@ -7,6 +7,7 @@ package miquifant.getemall.persistence
 
 import miquifant.getemall.log.Loggable.Logger
 import miquifant.getemall.log.LoggerFactory
+import miquifant.getemall.model.ProfileExt
 import miquifant.getemall.testingutils.initDatabaseConnection
 import miquifant.getemall.utils.ConnectionManager
 
@@ -141,5 +142,47 @@ class TestPersistenceProfiles {
     assertTrue(retKO is SQLReturnCode.DBError, "Return should be DBError")
     assertEquals("Unable to check Username availability due an internal error", retKO.message)
     assertFalse(alwaysFalse, "It should return username is not available")
+  }
+
+  @Test
+  fun testPatchProfileUsername() {
+    assertNotNull(db(), "Unable to execute test due an error with database connection")
+
+    val goodCurrentName1 = "esther"
+    val goodNewNameForName1 = "whatever"
+
+    val wrongCurrentName2 = "unexisting"
+    val goodNewNameForName2 = "boss"
+    val goodCurrentName2 = "miqui"
+    val wrongNewNameForName2 = "ramon"
+
+    val goodCurrentName3 = "ramon"
+    val goodNewNameForName3 = "god"
+
+    // Rename to the same name (left unchanged) returns PATCHED, as if it was changed
+    val retUnchanged = patchProfileUsername(goodCurrentName1, goodCurrentName1, db, logger)
+    assertEquals(SQLReturnCode.Patched, retUnchanged)
+
+    val retChanged = patchProfileUsername(goodCurrentName1, goodNewNameForName1, db, logger)
+    assertEquals(SQLReturnCode.Patched, retChanged)
+
+    val retNotFound = patchProfileUsername(wrongCurrentName2, goodNewNameForName2, db, logger)
+    assertEquals(SQLReturnCode.NotFound, retNotFound)
+
+    // -----------
+    // TEST ERRORS
+    // -----------
+
+    // Name already taken: Will fail due unique key violation
+    val retDupKey = patchProfileUsername(goodCurrentName2, wrongNewNameForName2, db, logger)
+    assertTrue(retDupKey is SQLReturnCode.UniqueError, "Return should be UniqueError")
+    assertEquals("Username already taken", retDupKey.message)
+
+    // Will fail due technical error (like connection error)
+    db().close()
+
+    val retConnErr = patchProfileUsername(goodCurrentName3, goodNewNameForName3, db , logger)
+    assertTrue(retConnErr is SQLReturnCode.DBError, "Return should be DBError")
+    assertEquals("Unable to patch profile '$goodCurrentName3' due an internal error", retConnErr.message)
   }
 }
