@@ -24,7 +24,8 @@ sealed class SQLReturnCode (private val code: Code) {
     DB_ERROR,         // Technical (like connection error)
     CONSTRAINT_ERROR, // IntegrityConstraintViolation (use only when not able specify the ICV)
     UNIQUE_ERROR,     // Unique index violation (like name already taken)
-    FK_ERROR;         // Referential integrity constraint violation (like owner not found or organization is not empty)
+    FK_ERROR,         // Referential integrity constraint violation (like owner not found or organization is not empty)
+    PK_ERROR;         // Primary key violation
   }
   object Succeeded: SQLReturnCode (SUCCEEDED)
   object Deleted:   SQLReturnCode (DELETED)
@@ -46,6 +47,7 @@ sealed class SQLReturnCode (private val code: Code) {
 
   data class UniqueError (override val message: String): ConstraintError(message, UNIQUE_ERROR)
   data class FKError     (override val message: String): ConstraintError(message, FK_ERROR)
+  data class PKError     (override val message: String): ConstraintError(message, PK_ERROR)
 
   /**
    * We expect some pattern in the message of the Exceptions produced by the violation of defined constraints.
@@ -55,16 +57,19 @@ sealed class SQLReturnCode (private val code: Code) {
    *   Unique index or primary key violation: "getemall.organization_name_un_INDEX_8 ON getemall.organizations(name) VALUES 3"; SQL statement: <...> [23505-200]
    *   Referential integrity constraint violation: "organization_users_fk: getemall.organizations FOREIGN KEY(owner) REFERENCES getemall.users(id) (0)"; SQL statement: <...> [23506-200]
    *   Referential integrity constraint violation: "<child>_organizations_fk: getemall.<child> FOREIGN KEY(<field>) REFERENCES getemall.organizations(id) (4)"; SQL statement: <...> [23503-200]
+   *   Unique index or primary key violation: "PRIMARY KEY ON getemall.profiles(id) [...<values>...]"; SQL statement: <...> [23505-200]
    *
    * MariaDB:
    *   Duplicate entry 'new org' for key 'organization_name_UN'
    *   Cannot add or update a child row: a foreign key constraint fails (`getemall`.`organizations`, CONSTRAINT `organization_users_FK` FOREIGN KEY (`owner`) REFERENCES `users` (`id`) ON UPDATE CASCADE)
    *   Cannot delete or update a parent row: a foreign key constraint fails (`getemall`.`<child>`, CONSTRAINT `<child>_organizations_FK` FOREIGN KEY (`<field>`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE)')
+   *   Duplicate entry '2' for key 'PRIMARY'
    *
    * Examples:
-   *   Constraint(Regex("(?i).*user_email_UN.*"), SQLReturnCode.UniqueError("Email already exists")),
-   *   Constraint(Regex("(?i).*user_superpowers_FK.*"), SQLReturnCode.FKError("Invalid role")),
+   *   Constraint(Regex("(?i).*user_email_UN.*"), SQLReturnCode.UniqueError("Email already exists"))
+   *   Constraint(Regex("(?i).*user_superpowers_FK.*"), SQLReturnCode.FKError("Invalid role"))
    *   Constraint(Regex("(?i).*organization_users_FK*"), SQLReturnCode.FKError("User is owner of some organization"))
+   *   Constraint(Regex(".*PRIMARY.*"), SQLReturnCode.PKError("Profile already exists"))
    */
   data class Constraint internal constructor (val id: Regex, val code: SQLReturnCode.ConstraintError)
 
