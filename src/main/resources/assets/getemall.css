@@ -55,3 +55,6 @@ button.actn.delete {
 button.actn.delete:hover {
   color: f00;
 }
+textarea {
+  resize: vertical;
+}

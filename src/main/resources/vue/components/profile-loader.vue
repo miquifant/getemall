@@ -16,7 +16,10 @@ Vue.component("profile-loader", {
     setProfile: function() {
       // Set Getemall profile from logged-in user
       handleFetch("profiles", "me",
-        profile => this.parent.profile = profile,
+        profile => {
+          this.parent.profile = profile;
+          if (this.parent.onProfileLoaded) this.parent.onProfileLoaded();
+        },
         e => this.error = e.message);
     }
   },

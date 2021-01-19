@@ -19,6 +19,7 @@
               <div class="menu-head-subtitle">Personal settings</div>
             </div>
           </div>
+          <a id="menu-settings-profile" class="menu-item" href="/settings/profile">Profile</a>
           <a id="menu-settings-account" class="menu-item" href="/settings/account">Account</a>
         </nav>
       </div>

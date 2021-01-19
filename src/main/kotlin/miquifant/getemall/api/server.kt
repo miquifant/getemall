@@ -107,8 +107,7 @@ fun startServer(opts: Opts): Javalin {
     post (Web.Uri.LOGIN,  LoginController.handleLoginPost(userDao, accessLogger), GrantedFor.anyone)
     post (Web.Uri.LOGOUT, LoginController.handleLogoutPost,                       GrantedFor.anyone)
 
-    // TODO /settings/profile --> redirects to --> /settings/account // until its implemented
-    get  (Web.Uri.SETTINGS_PROFILE,  VueComponent("settings-account"),  GrantedFor.loggedInUsers)
+    get  (Web.Uri.SETTINGS_PROFILE,  VueComponent("settings-profile"),  GrantedFor.loggedInUsers)
     get  (Web.Uri.SETTINGS_ACCOUNT,  VueComponent("settings-account"),  GrantedFor.loggedInUsers)
 
     get  (Web.Uri.PROFILES, VueComponent("profile"), GrantedFor.anyone)
