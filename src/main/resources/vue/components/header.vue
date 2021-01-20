@@ -30,7 +30,7 @@
         <ul class="dropdown-menu" aria-labelledby="profileDropdownMenu">
           <li><a :href="'/profiles/' + $javalin.state.currentUser">Your profile</a></li>
           <li role="separator" class="divider"></li>
-          <li><a href="/settings/account">Settings</a></li>
+          <li><a href="/settings/profile">Settings</a></li>
           <li><a href="/logout" @click.prevent="$('#logout').submit()">Log out</a><form id="logout" method="post" action="/logout"></form></li>
         </ul>
       </li>

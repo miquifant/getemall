@@ -58,6 +58,7 @@ const handleCheck = (endpoint, query, handler, errHandler) => {
         if (errHandler) errHandler(e);
     })
 };
+// frontend managed upsert (according to obj.id value)
 const handleSave = (endpoint, obj, handler, errHandler) => {
   return fetch("/api/" + endpoint, {
       method: (obj.id && obj.id !== 0)? "put": "post",
@@ -66,6 +67,23 @@ const handleSave = (endpoint, obj, handler, errHandler) => {
   }).then(res => res.json())
     .then(getResponseOrBreak)
     .then(handler)
+    .catch((e) => {
+        console.log("Error saving " + endpoint + ": " + e);
+        if (errHandler) errHandler(e);
+        else alert(e.message);
+    })
+};
+// backend managed upsert
+const handleUpsert = (endpoint, obj, handler, errHandler) => {
+  return fetch("/api/" + endpoint, {
+      method: "put",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(obj)
+  }).then(res => res.json())
+    .then((jsonData) => {
+      if (jsonData.code && jsonData.message) throw Error(jsonData.message);
+      return jsonData;
+  }).then(handler)
     .catch((e) => {
         console.log("Error saving " + endpoint + ": " + e);
         if (errHandler) errHandler(e);
