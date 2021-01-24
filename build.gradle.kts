@@ -54,6 +54,7 @@ dependencies {
   compile("com.offbytwo", "docopt", "0.6.0.20150202")
   compile("com.typesafe", "config", "1.3.4")
   compile("io.javalin", "javalin", "3.11.0")
+  compile("org.funktionale", "funktionale-all", "1.1")
   compile("org.mariadb.jdbc", "mariadb-java-client", "2.7.0")
   compile("org.mindrot", "jbcrypt", "0.3m")
   compile("org.slf4j", "slf4j-simple", "1.7.25")

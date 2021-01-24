@@ -7,6 +7,14 @@
 package miquifant.getemall.api
 
 import miquifant.getemall.api.authentication.impl.UserDatabaseDao
+import miquifant.getemall.api.controller.Admin
+import miquifant.getemall.api.controller.LoginController
+import miquifant.getemall.api.controller.Profiles
+import miquifant.getemall.api.controller.ServiceController
+import miquifant.getemall.api.controller.ProfilesController
+import miquifant.getemall.api.controller.Uploader
+import miquifant.getemall.api.controller.UploaderController
+import miquifant.getemall.api.controller.Web
 import miquifant.getemall.command.Opts
 import miquifant.getemall.command.loadFullConfig
 import miquifant.getemall.log.LoggerFactory
@@ -20,7 +28,6 @@ import io.javalin.Javalin
 import io.javalin.http.staticfiles.Location
 import io.javalin.plugin.rendering.vue.JavalinVue
 import io.javalin.plugin.rendering.vue.VueComponent
-import miquifant.getemall.api.controller.*
 import org.eclipse.jetty.server.handler.ContextHandler.MAX_FORM_CONTENT_SIZE_KEY
 
 
@@ -77,9 +84,6 @@ fun startServer(opts: Opts): Javalin {
     exception(Exception::class.java, ServiceController.exceptionHandler)
     before (ServiceController.sessionizeUser(userDao, accessLogger))
 
-    // TODO RECOLOCAR!
-    post (Uploader.Uri.UPLOAD, UploaderController.daledale(this), GrantedFor.loggedInUsers)
-
     /* =========================================================================================
      *  Endpoints
      * ========================================================================================= */
@@ -90,6 +94,9 @@ fun startServer(opts: Opts): Javalin {
     get  (Admin.Uri.READINESS,   ServiceController.readiness(userDao, db), GrantedFor.anyone)
     get  (Admin.Uri.METADATA,    ServiceController.metadata,   GrantedFor.anyone)
     post (Admin.Uri.KILL,        ServiceController.kill(this), GrantedFor.admins)
+
+    // Uploading of files
+    post (Uploader.Uri.UPLOAD, UploaderController.uploadAvatar(this), GrantedFor.loggedInUsers)
 
     // Profiles cRUd
     get   (Profiles.Uri.PROFILES,        ProfilesController.getAll(db),              GrantedFor.admins)

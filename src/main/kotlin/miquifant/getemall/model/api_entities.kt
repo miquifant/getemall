@@ -8,6 +8,7 @@ package miquifant.getemall.model
 
 import miquifant.getemall.persistence.SQLReturnCode
 import miquifant.getemall.persistence.SQLReturnCode.*
+import miquifant.getemall.utils.UploadReturnCode.*
 
 
 typealias Patch = Map<String, Any?>
@@ -42,6 +43,21 @@ data class ExceptionalResponse(val code: Int, val message: String) {
 
         // 200 Ok: Query Succeeded, Deleted, Updated, Unaltered (all with response body)
         else               -> ok        // Succeeded, Deleted, Updated, Unaltered
+      }
+    }
+
+    fun fromUploadError(uploadError: UploadError): ExceptionalResponse {
+      return when (uploadError) {
+
+        // 415 Unsupported media type with custom message
+        is WrongContentType     -> ExceptionalResponse(415, uploadError.message)
+
+        // 422 Unprocessable entity: If file is wrong somehow
+        is FileNotReceivedError -> ExceptionalResponse(422, uploadError.message)
+        is TooLargeFileError    -> ExceptionalResponse(422, uploadError.message)
+
+        // 500 Internal server error: Unexpected
+        else                    -> unknownError
       }
     }
   }

@@ -16,12 +16,11 @@ import miquifant.getemall.testingutils.initDatabaseConnection
 import miquifant.getemall.testingutils.initUnreadyDatabaseConnection
 import miquifant.getemall.utils.ConnectionManager
 
-import org.junit.Test
-
 import java.util.*
 
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 

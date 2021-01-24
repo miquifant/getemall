@@ -1,20 +1,24 @@
 /**
- * TODO
+ * URIs and Handlers related to uploading of files
  *
  * Created by miquifant on 2021-01-24
  */
 package miquifant.getemall.api.controller
 
+import miquifant.getemall.api.authentication.User
 import miquifant.getemall.log.LoggerFactory
 import miquifant.getemall.model.ExceptionalResponse
 import miquifant.getemall.utils.Handler
+import miquifant.getemall.utils.UploadReturnCode.*
 import miquifant.getemall.utils.exception
-import miquifant.getemall.utils.uploadedFiles
+import miquifant.getemall.utils.uploadedFile
 
 import io.javalin.Javalin
-import io.javalin.core.JettyUtil
 import io.javalin.http.UploadedFile
-import org.eclipse.jetty.server.handler.ContextHandler.MAX_FORM_CONTENT_SIZE_KEY
+import org.funktionale.either.Either
+import org.funktionale.either.Either.Left
+import org.funktionale.either.Either.Right
+import org.funktionale.either.flatMap
 
 
 object Uploader {
@@ -23,60 +27,61 @@ object Uploader {
   }
 }
 
+fun validateAvatar(file: UploadedFile): Either<UploadError, UploadedFile> {
+
+  val tip = "Your profile picture should be a PNG, JPG, or GIF file under 1 MB in size"
+  return when {
+
+    file.size > 1048576 ->
+      Left(TooLargeFileError("Too large image (${file.filename}). $tip"))
+
+    listOf(".gif", ".jpg", ".jpeg", ".png").firstOrNull { file.extension.toLowerCase() == it } == null ->
+      Left(WrongContentType("Invalid image type '${file.extension}'. $tip"))
+
+    else -> Right(file)
+  }
+}
+
+
 object UploaderController {
 
   private val logger = LoggerFactory.logger(UploaderController::class.java.canonicalName)
 
-  // FIXME naming
-  val daledale: (Javalin) -> Handler = { app ->
+  val uploadAvatar: (Javalin) -> Handler = { app ->
     { ctx ->
+      val currentUser = ctx.sessionAttribute<User?>("curUser")
+      if (currentUser != null) {
 
-      val jettyErrors = mutableListOf<String>()
-      val jettyServer = JettyUtil.getOrDefault(app.config.inner.server)
+        ctx.uploadedFile("avatar", app).right().flatMap { file ->
 
-      val uploadedFile: UploadedFile? = ctx.uploadedFiles (
-          jettyErrors,
-          "avatar",
-          maxFileSize = jettyServer.getAttribute(MAX_FORM_CONTENT_SIZE_KEY) as? Long ?: -1L
-      )
-      if (uploadedFile != null) {
-        /*
-         * [content]: the file-content as an [InputStream]
-         * [contentType]: the content-type passed by the client
-         * [size]: the size of the file in bytes
-         * [filename]: the file-name reported by the client
-         * [extension]: the file-extension, extracted from the [filename]
-         *
-         * Tip: Your profile picture should be a PNG, JPG, or GIF file under 1 MB in size.
-         * For the best quality rendering, we recommend keeping the image at about 500 by 500 pixels.
-         */
-        val tip = "Your profile picture should be a PNG, JPG, or GIF file under 1 MB in size"
-        val err: String? = when {
-          uploadedFile.size > 1048576 -> {
-            "File is too big (${uploadedFile.size / 1024L / 1024L} MB). $tip"
+          validateAvatar(file).right().map { avatar ->
+
+            /* TODO Complete this method
+             * [content]: the file-content as an [InputStream]
+             * [contentType]: the content-type passed by the client
+             * [size]: the size of the file in bytes
+             * [filename]: the file-name reported by the client
+             * [extension]: the file-extension, extracted from the [filename]
+             */
+            val tmpResponse = mapOf (
+                "content-type" to avatar.contentType,
+                "size" to avatar.size,
+                "filename" to avatar.filename,
+                "extension" to avatar.extension
+            )
+            /*FileUtil.streamToFile(file.content, "upload/${file.filename}") // FIXME */
+            logger.info { "${currentUser.name} uploaded avatar: $tmpResponse" }
+            ctx.status(201).json(tmpResponse)
           }
-          listOf("gif", "jpg", "jpeg", "png").firstOrNull { uploadedFile.extension.toLowerCase() == it } == null -> {
-            "Invalid file type. $tip"
-          }
-          else -> null
         }
-        if (err == null) {
-          ctx.json(mapOf(
-              "content-type" to uploadedFile.contentType,
-              "size" to uploadedFile.size,
-              "filename" to uploadedFile.filename,
-              "extension" to uploadedFile.extension
-          ))
-          /*FileUtil.streamToFile(uploadedFile.content, "upload/${uploadedFile.filename}")*/
+        // 415 Invalid type / 422 Unprocessable file / 500 Unknown error
+        .left().map { uploadError ->
+          logger.error { "${currentUser.name} failed to upload avatar due an error: ${uploadError.message}" }
+          ctx.exception(ExceptionalResponse.fromUploadError(uploadError))
         }
-        // ??? ???????????
-        else ctx.exception(ExceptionalResponse(400, err))
       }
-      // 400 Bad request
-      else {
-        logger.info { jettyErrors.joinToString("\n") { it } } // TODO
-        ctx.exception(ExceptionalResponse.badRequest)         // TODO TOO
-      }
+      // 401 Unauthorized
+      else ctx.exception(ExceptionalResponse.unauthorized)
     }
   }
 }
