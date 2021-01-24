@@ -7,12 +7,6 @@
 package miquifant.getemall.api
 
 import miquifant.getemall.api.authentication.impl.UserDatabaseDao
-import miquifant.getemall.api.controller.Admin
-import miquifant.getemall.api.controller.LoginController
-import miquifant.getemall.api.controller.Profiles
-import miquifant.getemall.api.controller.ServiceController
-import miquifant.getemall.api.controller.ProfilesController
-import miquifant.getemall.api.controller.Web
 import miquifant.getemall.command.Opts
 import miquifant.getemall.command.loadFullConfig
 import miquifant.getemall.log.LoggerFactory
@@ -26,6 +20,8 @@ import io.javalin.Javalin
 import io.javalin.http.staticfiles.Location
 import io.javalin.plugin.rendering.vue.JavalinVue
 import io.javalin.plugin.rendering.vue.VueComponent
+import miquifant.getemall.api.controller.*
+import org.eclipse.jetty.server.handler.ContextHandler.MAX_FORM_CONTENT_SIZE_KEY
 
 
 const val DEFAULT_PORT = 8080
@@ -67,11 +63,22 @@ fun startServer(opts: Opts): Javalin {
   }.apply {
 
     /* =========================================================================================
+     *  Define underlying Jetty server parameters
+     * ========================================================================================= */
+    // Define server's hard limit for received files: 2,097,152 bytes
+    logger.debug { "Defining server's hard limit for received files size..." }
+    val jetty = this.server()?.server()
+    jetty?.setAttribute(MAX_FORM_CONTENT_SIZE_KEY, 2097152L)
+
+    /* =========================================================================================
      *  Define EXCEPTION and ERROR handlers, and General FILTERS
      * ========================================================================================= */
     logger.debug { "Defining error handlers and filters..." }
     exception(Exception::class.java, ServiceController.exceptionHandler)
     before (ServiceController.sessionizeUser(userDao, accessLogger))
+
+    // TODO RECOLOCAR!
+    post (Uploader.Uri.UPLOAD, UploaderController.daledale(this), GrantedFor.loggedInUsers)
 
     /* =========================================================================================
      *  Endpoints
