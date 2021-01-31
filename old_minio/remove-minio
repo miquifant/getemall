@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+MINIO_LAUNCHER_HOME=$(readlink -e $0)
+MINIO_LAUNCHER_HOME=$(dirname ${MINIO_LAUNCHER_HOME})
+MINIO_LAUNCHER_HOME=$(cd "${MINIO_LAUNCHER_HOME}"; pwd)
+
+cd ${MINIO_LAUNCHER_HOME}
+
+docker stop minio-getemall 2 &> /dev/null
+docker rm minio-getemall 2 &> /dev/null
+rm -fr data
+echo -e "Removed minio"
+
+docker stop mc-getemall 2 &> /dev/null
+docker rm mc-getemall 2 &> /dev/null
+sudo rm -fr .mc
+echo -e "Removed mc"

@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+function banner() {
+  [[ ! -z $1 ]] && \
+  echo -e "\n> $1\n================================================================================"
+}
+
+MINIO_LAUNCHER_HOME=$(readlink -e $0)
+MINIO_LAUNCHER_HOME=$(dirname ${MINIO_LAUNCHER_HOME})
+MINIO_LAUNCHER_HOME=$(cd "${MINIO_LAUNCHER_HOME}"; pwd)
+
+MINIO_DATA=${MINIO_LAUNCHER_HOME}/test
+
+clear
+cd ${MINIO_LAUNCHER_HOME}
+
+# =================================================================================================
+banner "Removing minio and mc..."
+./remove-minio
+
+# =================================================================================================
+banner "Creating minio..."
+mkdir -p data
+docker create -p9000:9000 -v$PWD/data:/data --name minio-getemall --user=$(id -u):$(id -g) minio/minio minio server /data
+docker start minio-getemall 2 &> /dev/null
+sleep 1
+
+# =================================================================================================
+banner "Creating mc..."
+docker create -it --name=mc-getemall --net=host -v$PWD/.mc:/root/.mc -v${MINIO_DATA}:/data --entrypoint=/bin/sh minio/mc
+docker start mc-getemall 2 &> /dev/null
+
+# =================================================================================================
+banner "Initializing alias..." # set local and remove gcs, s3 and play
+docker exec mc-getemall mc alias rm gcs
+docker exec mc-getemall mc alias rm local
+docker exec mc-getemall mc alias rm play
+docker exec mc-getemall mc alias rm s3
+docker exec mc-getemall mc alias set local http://localhost:9000 minioadmin minioadmin
+
+# =================================================================================================
+banner "Configuring users and groups..."
+docker exec mc-getemall mc admin user add local miqui password
+docker exec mc-getemall mc admin group add local admins miqui
+
+# =================================================================================================
+banner "Creating buckets..."
+docker exec mc-getemall mc mb -p --region=europe-spain local/getemall
+docker exec mc-getemall mc cp -r data/avatars local/getemall/_pub/
+echo -e "\nCreated buckets. Tree:\n----------------------"
+docker exec mc-getemall mc tree local
+echo -e "\nUploaded files:\n---------------"
+docker exec mc-getemall mc ls -r local
+
+# =================================================================================================
+banner "Exiting..."
+echo -e "Finished starting minio."
+echo -e "\n- You can define alias mc='docker exec mc-getemall mc' to execute mc commands"
+echo -en "- You can access minio using a browser: Browser Access for "
+docker exec mc-getemall mc alias list
