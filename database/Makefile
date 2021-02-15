@@ -98,28 +98,33 @@ destroy-os: confirm
 	@docker rm minio-getemall > /dev/null
 	@rm -fr minio-data
 	@echo -e "Removed minio"
+	@docker exec mc-getemall rm -fr /root/.mc 
 	@docker stop mc-getemall > /dev/null
 	@docker rm mc-getemall > /dev/null
-	@sudo rm -fr .mc
+	@echo sudo rm -fr .mc
 	@echo -e "Removed mc"
 
-start-os:
+start-os: start-mc start-minio
+
+start-mc:
+	@$(call banner,"Creating mc... (TODO as root)") # TODO
+	@docker create -it --name=mc-getemall --net=host -v${PWD}/.mc:/root/.mc -v${PWD}/objects:/data --entrypoint=/bin/sh minio/mc
+	@docker start mc-getemall > /dev/null
+
+start-minio:
 	@$(call banner,"Creating minio...")
 	@mkdir -p minio-data
 	@docker create -p9000:9000 -v${PWD}/minio-data:/data --name minio-getemall --user=$(shell id -u):$(shell id -g) minio/minio minio server /data
 	@docker start minio-getemall > /dev/null
 	@sleep 1
-	@$(call banner,"Creating mc...")
-	@docker create -it --name=mc-getemall --net=host -v${PWD}/.mc:/root/.mc -v${PWD}/objects:/data --entrypoint=/bin/sh minio/mc
-	@docker start mc-getemall > /dev/null
+
+schema-os:
 	@$(call banner,"Initializing alias...") # set local and remove gcs, s3 and play
 	@docker exec mc-getemall mc alias rm gcs
 	@docker exec mc-getemall mc alias rm local
 	@docker exec mc-getemall mc alias rm play
 	@docker exec mc-getemall mc alias rm s3
 	@docker exec mc-getemall mc alias set local http://localhost:9000 minioadmin minioadmin
-
-schema-os:
 	@$(call banner,"Configuring users and groups...")
 	@docker exec mc-getemall mc admin user add local miqui password
 	@docker exec mc-getemall mc admin group add local admins miqui
